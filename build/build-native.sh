@@ -110,8 +110,8 @@ shared_link_flags() {
 }
 
 # Ad-hoc codesign a freshly built dylib on macOS. Unsigned dylibs are killed on load
-# on Apple Silicon, so this is required for the library to be usable at all. Guarded
-# so the script still works on a mac without codesign on PATH (and is a no-op on Linux).
+# on Apple Silicon, so this is required for the library to be usable at all (see the
+# Platform notes header: signing is MANDATORY, not cosmetic). A no-op on Linux.
 codesign_if_mac() {
   local file="$1"
   if [[ "$IS_MAC" -eq 1 ]]; then
@@ -120,7 +120,12 @@ codesign_if_mac() {
       codesign --sign - --force "$file"
       echo "Ad-hoc signed $file"
     else
-      echo "warning: codesign not found; '$file' is unsigned and may be killed on load (arm64)." >&2
+      # An unsigned dylib is SIGKILLed by the kernel on dlopen on Apple Silicon, so the
+      # artifact would be unusable. Fail hard rather than emit a broken library.
+      echo "error: codesign not found but is required on macOS; '$file' would be unsigned" \
+        "and SIGKILLed on load (arm64). Install the Xcode command line tools (xcode-select" \
+        "--install) and re-run." >&2
+      exit 1
     fi
   fi
 }

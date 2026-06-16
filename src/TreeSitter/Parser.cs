@@ -179,11 +179,11 @@ public sealed class Parser : IDisposable
     /// </summary>
     /// <param name="utf8Source">The UTF-8 encoded source to parse.</param>
     /// <param name="oldTree">A previously-parsed, edited tree to reuse, or <see langword="null"/>.</param>
-    /// <returns>The parsed tree, or <see langword="null"/> if no language is set or parsing was cancelled.</returns>
+    /// <returns>The parsed tree, or <see langword="null"/> if parsing was cancelled (timeout).</returns>
+    /// <exception cref="InvalidOperationException">No language has been set on the parser.</exception>
     public Tree? Parse(ReadOnlySpan<byte> utf8Source, Tree? oldTree = null)
     {
-        if (_language is null)
-            return null;
+        EnsureLanguage();
 
         // The tree must retain its own copy of the bytes so Node.Text stays valid.
         byte[] copy = utf8Source.ToArray();
@@ -196,14 +196,28 @@ public sealed class Parser : IDisposable
     /// </summary>
     /// <param name="source">The source text to parse.</param>
     /// <param name="oldTree">A previously-parsed, edited tree to reuse, or <see langword="null"/>.</param>
-    /// <returns>The parsed tree, or <see langword="null"/> if no language is set or parsing was cancelled.</returns>
+    /// <returns>The parsed tree, or <see langword="null"/> if parsing was cancelled (timeout).</returns>
+    /// <exception cref="ArgumentNullException"><paramref name="source"/> is <see langword="null"/>.</exception>
+    /// <exception cref="InvalidOperationException">No language has been set on the parser.</exception>
     public Tree? Parse(string source, Tree? oldTree = null)
     {
         ArgumentNullException.ThrowIfNull(source);
-        if (_language is null)
-            return null;
+        EnsureLanguage();
         byte[] bytes = Encoding.UTF8.GetBytes(source);
         return ParseBytes(bytes, oldTree);
+    }
+
+    /// <summary>
+    /// Throws <see cref="InvalidOperationException"/> if no language has been set. A
+    /// missing language is a programmer error (distinct from a <see langword="null"/>
+    /// return, which is reserved for a cancelled/timed-out parse).
+    /// </summary>
+    private void EnsureLanguage()
+    {
+        if (_language is null)
+            throw new InvalidOperationException(
+                "No language has been set on the parser; set the Language (or use the " +
+                "Language ctor) before parsing.");
     }
 
     private unsafe Tree? ParseBytes(byte[] utf8, Tree? oldTree)

@@ -91,6 +91,19 @@ function Get-CoreExportsDef {
     }
     if ($symbols.Count -eq 0) { throw "no ts_* exports found in $apiHeader" }
 
+    # Drop the WASM-store entry points that api.h declares unconditionally but
+    # lib/src/wasm_store.c defines ONLY under `#ifdef TREE_SITTER_FEATURE_WASM`. The
+    # default (no-WASM) core build — what build-native.sh and Build-Core produce — has
+    # an `#else` block that stubs MOST wasm functions (ts_wasm_store_delete, _start,
+    # _reset, ts_language_is_wasm, ...) so those DO get definitions, but these three are
+    # NOT stubbed there, so the object file never emits them. Listing an undefined symbol
+    # in a .def EXPORTS section is a hard link error for both lld-link (clang -Wl,/def:)
+    # and link.exe (/DEF:), so we must exclude exactly these three. (Verified against the
+    # built libtree-sitter.so: 149 ts_* exports, with these three absent.)
+    foreach ($wasmGated in @('ts_wasm_store_new', 'ts_wasm_store_load_language', 'ts_wasm_store_language_count')) {
+        [void]$symbols.Remove($wasmGated)
+    }
+
     $defPath = Join-Path $OutDir 'tree-sitter.def'
     $lines = @('LIBRARY tree-sitter', 'EXPORTS') + ($symbols | ForEach-Object { "    $_" })
     Set-Content -Path $defPath -Value $lines -Encoding ascii
