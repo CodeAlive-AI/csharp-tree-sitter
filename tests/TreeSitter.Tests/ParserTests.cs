@@ -45,11 +45,13 @@ public class ParserTests
     }
 
     [Fact]
-    public void Parse_without_language_returns_null()
+    public void Parse_without_language_throws_InvalidOperation()
     {
         using var parser = new Parser();
-        Assert.Null(parser.Parse("{}"));
-        Assert.Null(parser.Parse("{}"u8));
+        // Parsing with no language set is a programming error (distinct from a
+        // null return, which is reserved for timeout/cancellation).
+        Assert.Throws<InvalidOperationException>(() => parser.Parse("{}"));
+        Assert.Throws<InvalidOperationException>(() => parser.Parse("{}"u8));
     }
 
     [Fact]

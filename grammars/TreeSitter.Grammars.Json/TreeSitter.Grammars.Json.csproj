@@ -24,13 +24,17 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\TreeSitter\TreeSitter.csproj" />
+    <!-- JsonLanguage resolves the grammar by name via LanguagePack; this reference
+         also makes the json grammar native lib ship transitively (LanguagePack packs
+         the grammar libs under runtimes/<rid>/native/). -->
+    <ProjectReference Include="..\..\src\TreeSitter.LanguagePack\TreeSitter.LanguagePack.csproj" />
   </ItemGroup>
 
   <!--
     Dev/test convenience: copy the JSON grammar native lib next to this assembly so
     the resolver's AssemblyDirectory probe finds libtree-sitter-json.so during
-    `dotnet run`/`dotnet test`. Pack="false": shipping payload travels with the core
-    package's runtimes/<rid>/native assets.
+    `dotnet run`/`dotnet test`. Pack="false": the shipping payload travels with the
+    TreeSitter.LanguagePack package's runtimes/<rid>/native assets (referenced above).
   -->
   <ItemGroup>
     <None Include="$(RepoRoot)native/$(NETCoreSdkPortableRuntimeIdentifier)/libtree-sitter-json.*"
