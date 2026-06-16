@@ -321,7 +321,13 @@ public readonly struct Node : IEquatable<Node>
     public override bool Equals(object? obj) => obj is Node other && Equals(other);
 
     /// <inheritdoc/>
-    public override int GetHashCode() => _node.GetHashCode();
+    /// <remarks>
+    /// All null nodes hash to <c>0</c> so that a tree-attached null node (e.g.
+    /// <see cref="Parent"/> of the root, or an absent <see cref="ChildByFieldName(string)"/>)
+    /// and <c>default(Node)</c> — which <see cref="Equals(Node)"/> reports as equal —
+    /// also have equal hash codes, honouring the equality/hash contract.
+    /// </remarks>
+    public override int GetHashCode() => IsNull ? 0 : _node.GetHashCode();
 
     /// <summary>Determines whether two nodes are identical.</summary>
     public static bool operator ==(Node left, Node right) => left.Equals(right);

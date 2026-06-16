@@ -225,6 +225,50 @@ public class LanguagePackTests
         Assert.Same(Pack.Get("python"), lang);
     }
 
+    [Fact]
+    public void Grammar_load_uses_TreeSitter_resolver_with_env_override()
+    {
+        // Regression for M-Resolver: grammar libs must load through the TreeSitter
+        // assembly's NativeLibraryResolver (TREE_SITTER_NATIVE_PATH must apply). Point
+        // the override explicitly at the repo native/<rid> dir, clear the cache for a
+        // bundled grammar so the load actually re-runs, then load + parse via the pack.
+        string nativeDir = System.IO.Path.Combine(
+            TestData.RepoRoot(), "native", HostRid());
+        if (!System.IO.File.Exists(System.IO.Path.Combine(nativeDir, "libtree-sitter-yaml.so")) &&
+            !System.IO.File.Exists(System.IO.Path.Combine(nativeDir, "libtree-sitter-yaml.dylib")) &&
+            !System.IO.File.Exists(System.IO.Path.Combine(nativeDir, "tree-sitter-yaml.dll")))
+        {
+            return; // grammar not built locally; skip cleanly (CI builds it)
+        }
+
+        string? saved = Environment.GetEnvironmentVariable("TREE_SITTER_NATIVE_PATH");
+        try
+        {
+            Environment.SetEnvironmentVariable("TREE_SITTER_NATIVE_PATH", nativeDir);
+            // 'yaml' is bundled for the tests; load it through the pack (resolver fires).
+            Language lang = Pack.Get("yaml");
+            Assert.NotNull(lang);
+            using Parser parser = new(lang);
+            using Tree? tree = parser.Parse("a: 1");
+            Assert.NotNull(tree);
+            Assert.Equal("stream", tree!.RootNode.Kind);
+        }
+        finally
+        {
+            Environment.SetEnvironmentVariable("TREE_SITTER_NATIVE_PATH", saved);
+        }
+    }
+
+    private static string HostRid()
+    {
+        System.Runtime.InteropServices.OSPlatform os =
+            OperatingSystem.IsWindows() ? System.Runtime.InteropServices.OSPlatform.Windows
+            : OperatingSystem.IsMacOS() ? System.Runtime.InteropServices.OSPlatform.OSX
+            : System.Runtime.InteropServices.OSPlatform.Linux;
+        return TreeSitter.Native.NativeLibraryResolver.GetRid(
+            os, System.Runtime.InteropServices.RuntimeInformation.ProcessArchitecture);
+    }
+
     // ---- Error paths -----------------------------------------------------------
 
     [Fact]

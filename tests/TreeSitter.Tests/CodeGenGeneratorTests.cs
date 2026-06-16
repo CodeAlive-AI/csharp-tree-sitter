@@ -6,7 +6,10 @@ public class NodeTypesGeneratorTests
 {
     private static GeneratedGrammar Generate(string language, string rootNs)
     {
-        string? json = TestData.NodeTypesJson(language);
+        // Prefer the vendored copy (always next to the test assembly) so json/python
+        // generator tests are hermetic; fall back to a fetched source for other grammars.
+        string vendored = TestData.VendoredNodeTypesPath(language);
+        string? json = File.Exists(vendored) ? File.ReadAllText(vendored) : TestData.NodeTypesJson(language);
         Assert.NotNull(json);
         return NodeTypesGenerator.Generate(json!, new GeneratorOptions
         {
@@ -56,13 +59,29 @@ public class NodeTypesGeneratorTests
         Assert.Equal(a, b); // byte-identical across runs
     }
 
+    /// <summary>
+    /// Generates a grammar from the VENDORED node-types.json copy (TestData/), so the
+    /// drift guard is hermetic and always runs regardless of /tmp grammar sources.
+    /// </summary>
+    private static GeneratedGrammar GenerateVendored(string language, string rootNs)
+    {
+        string json = TestData.VendoredNodeTypesJson(language);
+        return NodeTypesGenerator.Generate(json, new GeneratorOptions
+        {
+            RootNamespace = rootNs,
+            LanguageName = language,
+        });
+    }
+
     [Fact]
     public void Generate_json_matches_checked_in_binding()
     {
-        // The checked-in grammars/TreeSitter.Grammars.Json/Json.Nodes.g.cs compiles as
-        // part of the solution build; asserting the generator reproduces it byte-for-byte
-        // is an integration proof that the generated output compiles.
-        GeneratedGrammar g = Generate("json", "TreeSitter.Grammars.Json");
+        // HERMETIC drift guard: regenerate from the VENDORED node-types.json (the exact
+        // input the checked-in binding was produced from) and assert byte-for-byte
+        // equality with grammars/TreeSitter.Grammars.Json/Json.Nodes.g.cs. Never depends
+        // on /tmp, so it always runs (incl. a clean CI checkout). Also an integration
+        // proof that the generated output compiles (the checked-in file is in the build).
+        GeneratedGrammar g = GenerateVendored("json", "TreeSitter.Grammars.Json");
         string generated = g.Files[0].Source;
 
         string checkedInPath = Path.Combine(
@@ -71,6 +90,23 @@ public class NodeTypesGeneratorTests
         string checkedIn = File.ReadAllText(checkedInPath);
 
         // Normalize line endings before comparison to be robust to git autocrlf.
+        Assert.Equal(Normalize(checkedIn), Normalize(generated));
+    }
+
+    [Fact]
+    public void Generate_python_matches_checked_in_binding()
+    {
+        // HERMETIC drift guard for the COMPLEX grammar (supertypes, anonymous unions,
+        // hashed member names): regenerate from the vendored python node-types.json and
+        // assert byte-for-byte equality with the checked-in Python.Nodes.g.cs.
+        GeneratedGrammar g = GenerateVendored("python", "TreeSitter.Grammars.Python");
+        string generated = g.Files[0].Source;
+
+        string checkedInPath = Path.Combine(
+            TestData.RepoRoot(), "grammars", "TreeSitter.Grammars.Python", "Python.Nodes.g.cs");
+        Assert.True(File.Exists(checkedInPath), $"missing {checkedInPath}");
+        string checkedIn = File.ReadAllText(checkedInPath);
+
         Assert.Equal(Normalize(checkedIn), Normalize(generated));
     }
 

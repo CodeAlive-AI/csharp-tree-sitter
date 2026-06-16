@@ -180,9 +180,9 @@ public class SchemaTests
     [Fact]
     public void Parse_real_json_grammar_source()
     {
-        string? json = TestData.NodeTypesJson("json");
-        Assert.NotNull(json);
-        IReadOnlyList<NodeType> nodes = NodeTypesParser.Parse(json!);
+        // Use the vendored node-types.json so this test is hermetic (no /tmp dependency).
+        string json = TestData.VendoredNodeTypesJson("json");
+        IReadOnlyList<NodeType> nodes = NodeTypesParser.Parse(json);
         Assert.NotEmpty(nodes);
         // The _value supertype is present.
         Assert.Contains(nodes, n => n.Type == "_value" && n.IsSupertype);

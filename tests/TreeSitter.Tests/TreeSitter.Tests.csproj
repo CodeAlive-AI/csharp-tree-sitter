@@ -49,6 +49,16 @@
   </ItemGroup>
 
   <!--
+    Vendored grammar node-types.json copies used by the HERMETIC codegen drift guard
+    (Generate_json/python_matches_checked_in_binding). These are the EXACT inputs the
+    checked-in grammars/*/*.Nodes.g.cs were generated from, so those tests never depend
+    on /tmp grammar sources and always run (including a clean CI checkout).
+  -->
+  <ItemGroup>
+    <None Include="TestData\*.node-types.json" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
+  <!--
     Copy the host RID's prebuilt native libraries (core runtime + every grammar lib)
     next to the test assembly so the NativeLibraryResolver's AssemblyDirectory probe
     finds them regardless of the working directory. The assembly fixture / module

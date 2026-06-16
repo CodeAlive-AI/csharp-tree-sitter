@@ -87,12 +87,28 @@ internal static class Grammars
 /// </summary>
 internal static class TestData
 {
-    /// <summary>Candidate roots that may hold <c>&lt;lang&gt;/src/node-types.json</c>.</summary>
-    private static readonly string[] GrammarRoots =
-    [
-        "/tmp/grammars",
-        Path.Combine(RepoRoot(), "tree-sitter"),
-    ];
+    /// <summary>
+    /// Candidate roots that may hold <c>&lt;lang&gt;/src/node-types.json</c>. Includes
+    /// the <c>TREE_SITTER_GRAMMARS</c> env override (if set), the fetch scripts' clone
+    /// cache (<c>/tmp/ts-grammars</c>, the default <c>CACHE_DIR</c> of
+    /// <c>fetch-grammar.sh</c>/<c>fetch-test-grammars.sh</c>), a legacy
+    /// out-of-band location (<c>/tmp/grammars</c>), and the submodule tree. This makes
+    /// the determinism/CLI tests actually execute in CI (which clones to
+    /// <c>/tmp/ts-grammars</c>) rather than silently no-op.
+    /// </summary>
+    private static readonly string[] GrammarRoots = BuildGrammarRoots();
+
+    private static string[] BuildGrammarRoots()
+    {
+        var roots = new List<string>();
+        string? envOverride = Environment.GetEnvironmentVariable("TREE_SITTER_GRAMMARS");
+        if (!string.IsNullOrEmpty(envOverride))
+            roots.Add(envOverride);
+        roots.Add("/tmp/ts-grammars");
+        roots.Add("/tmp/grammars");
+        roots.Add(Path.Combine(RepoRoot(), "tree-sitter"));
+        return roots.ToArray();
+    }
 
     /// <summary>Returns the repository root by walking up from the test assembly.</summary>
     public static string RepoRoot()
@@ -131,6 +147,19 @@ internal static class TestData
         string? p = NodeTypesPath(language);
         return p is null ? null : File.ReadAllText(p);
     }
+
+    /// <summary>
+    /// Path to a VENDORED grammar <c>node-types.json</c> copied next to the test
+    /// assembly (<c>TestData/&lt;lang&gt;.node-types.json</c>). Unlike
+    /// <see cref="NodeTypesPath(string)"/> this never depends on /tmp or the submodule
+    /// tree, so the hermetic drift-guard tests always run.
+    /// </summary>
+    public static string VendoredNodeTypesPath(string language) =>
+        Path.Combine(AppContext.BaseDirectory, "TestData", $"{language}.node-types.json");
+
+    /// <summary>Reads a vendored grammar's <c>node-types.json</c> text.</summary>
+    public static string VendoredNodeTypesJson(string language) =>
+        File.ReadAllText(VendoredNodeTypesPath(language));
 
     /// <summary>Creates a parser bound to the JSON grammar.</summary>
     public static Parser JsonParser() => new(Grammars.Json);

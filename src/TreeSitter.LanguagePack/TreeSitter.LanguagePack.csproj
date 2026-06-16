@@ -19,8 +19,10 @@
     <IsTrimmable>true</IsTrimmable>
     <IsAotCompatible>true</IsAotCompatible>
 
-    <!-- Portable RIDs this pack ships grammar native assets for. -->
-    <RuntimeIdentifiers>linux-x64;osx-arm64;osx-x64;win-x64</RuntimeIdentifiers>
+    <!-- Portable RIDs this pack ships grammar native assets for. Narrowed to the RIDs
+         actually bundled below (linux-x64, osx-arm64); osx-x64/win-x64 are build-from-source
+         only (not bundled), matching the core project's narrowing. -->
+    <RuntimeIdentifiers>linux-x64;osx-arm64</RuntimeIdentifiers>
   </PropertyGroup>
 
   <ItemGroup>

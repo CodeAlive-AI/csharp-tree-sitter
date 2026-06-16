@@ -163,7 +163,7 @@ grammar's `src/node-types.json` and emits one `.cs` file of zero-allocation
   `name -> LanguageInfo` index and the extension index.
 * `build-native.sh <c_symbol> <srcDir>` compiles `parser.c` (+ `scanner.c` as
   C11 / `scanner.cc` as C++ linked with the C++ runtime) into
-  `native/<rid>/tree-sitter-<c_symbol>.so`; `scripts/fetch-grammar.sh <name>`
+  `native/<rid>/libtree-sitter-<c_symbol>.so`; `scripts/fetch-grammar.sh <name>`
   clones the pinned `rev` (optionally running `tree-sitter generate`) and builds.
 * `LanguagePack.Get("python")` resolves the `c_symbol`, loads the grammar lib
   via the resolver, invokes its `tree_sitter_<c_symbol>` export, and returns a

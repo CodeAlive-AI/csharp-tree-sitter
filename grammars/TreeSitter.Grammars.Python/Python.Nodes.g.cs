@@ -476,11 +476,11 @@ namespace TreeSitter.Grammars.Python
         }
         /// <summary>The required <c>alias</c> field.</summary>
         /// <exception cref="global::TreeSitter.Typed.IncorrectNodeKindException">The field is absent or has an unexpected kind.</exception>
-        public TreeSitter.Grammars.Python.Identifier Alias => TreeSitter.Grammars.Python.Identifier.TryFrom(Node.ChildByFieldName("alias")) ?? throw new global::TreeSitter.Typed.IncorrectNodeKindException(Node, "TreeSitter.Grammars.Python.Identifier", "alias");
+        public TreeSitter.Grammars.Python.Identifier Alias => TreeSitter.Grammars.Python.Identifier.TryFrom(Node.ChildByFieldName("alias")) ?? throw new global::TreeSitter.Typed.IncorrectNodeKindException(Node, "TreeSitter.Grammars.Python.Identifier");
 
         /// <summary>The required <c>name</c> field.</summary>
         /// <exception cref="global::TreeSitter.Typed.IncorrectNodeKindException">The field is absent or has an unexpected kind.</exception>
-        public TreeSitter.Grammars.Python.DottedName Name => TreeSitter.Grammars.Python.DottedName.TryFrom(Node.ChildByFieldName("name")) ?? throw new global::TreeSitter.Typed.IncorrectNodeKindException(Node, "TreeSitter.Grammars.Python.DottedName", "name");
+        public TreeSitter.Grammars.Python.DottedName Name => TreeSitter.Grammars.Python.DottedName.TryFrom(Node.ChildByFieldName("name")) ?? throw new global::TreeSitter.Typed.IncorrectNodeKindException(Node, "TreeSitter.Grammars.Python.DottedName");
 
     }
 
@@ -693,7 +693,7 @@ namespace TreeSitter.Grammars.Python
         }
         /// <summary>The required <c>left</c> field.</summary>
         /// <exception cref="global::TreeSitter.Typed.IncorrectNodeKindException">The field is absent or has an unexpected kind.</exception>
-        public TreeSitter.Grammars.Python.AnonUnions.Pattern_PatternList Left => TreeSitter.Grammars.Python.AnonUnions.Pattern_PatternList.TryFrom(Node.ChildByFieldName("left")) ?? throw new global::TreeSitter.Typed.IncorrectNodeKindException(Node, "TreeSitter.Grammars.Python.AnonUnions.Pattern_PatternList", "left");
+        public TreeSitter.Grammars.Python.AnonUnions.Pattern_PatternList Left => TreeSitter.Grammars.Python.AnonUnions.Pattern_PatternList.TryFrom(Node.ChildByFieldName("left")) ?? throw new global::TreeSitter.Typed.IncorrectNodeKindException(Node, "TreeSitter.Grammars.Python.AnonUnions.Pattern_PatternList");
 
         /// <summary>The optional <c>right</c> field, or <see langword="null"/> when absent.</summary>
         public TreeSitter.Grammars.Python.AnonUnions.Assignment_AugmentedAssignment_Expression_ExpressionList_PatternList_Yield? Right => TreeSitter.Grammars.Python.AnonUnions.Assignment_AugmentedAssignment_Expression_ExpressionList_PatternList_Yield.TryFrom(Node.ChildByFieldName("right"));
@@ -737,11 +737,11 @@ namespace TreeSitter.Grammars.Python
         }
         /// <summary>The required <c>attribute</c> field.</summary>
         /// <exception cref="global::TreeSitter.Typed.IncorrectNodeKindException">The field is absent or has an unexpected kind.</exception>
-        public TreeSitter.Grammars.Python.Identifier Attribute_ => TreeSitter.Grammars.Python.Identifier.TryFrom(Node.ChildByFieldName("attribute")) ?? throw new global::TreeSitter.Typed.IncorrectNodeKindException(Node, "TreeSitter.Grammars.Python.Identifier", "attribute");
+        public TreeSitter.Grammars.Python.Identifier Attribute_ => TreeSitter.Grammars.Python.Identifier.TryFrom(Node.ChildByFieldName("attribute")) ?? throw new global::TreeSitter.Typed.IncorrectNodeKindException(Node, "TreeSitter.Grammars.Python.Identifier");
 
         /// <summary>The required <c>object</c> field.</summary>
         /// <exception cref="global::TreeSitter.Typed.IncorrectNodeKindException">The field is absent or has an unexpected kind.</exception>
-        public TreeSitter.Grammars.Python.PrimaryExpression Object => TreeSitter.Grammars.Python.PrimaryExpression.TryFrom(Node.ChildByFieldName("object")) ?? throw new global::TreeSitter.Typed.IncorrectNodeKindException(Node, "TreeSitter.Grammars.Python.PrimaryExpression", "object");
+        public TreeSitter.Grammars.Python.PrimaryExpression Object => TreeSitter.Grammars.Python.PrimaryExpression.TryFrom(Node.ChildByFieldName("object")) ?? throw new global::TreeSitter.Typed.IncorrectNodeKindException(Node, "TreeSitter.Grammars.Python.PrimaryExpression");
 
     }
 
@@ -779,15 +779,15 @@ namespace TreeSitter.Grammars.Python
         }
         /// <summary>The required <c>left</c> field.</summary>
         /// <exception cref="global::TreeSitter.Typed.IncorrectNodeKindException">The field is absent or has an unexpected kind.</exception>
-        public TreeSitter.Grammars.Python.AnonUnions.Pattern_PatternList Left => TreeSitter.Grammars.Python.AnonUnions.Pattern_PatternList.TryFrom(Node.ChildByFieldName("left")) ?? throw new global::TreeSitter.Typed.IncorrectNodeKindException(Node, "TreeSitter.Grammars.Python.AnonUnions.Pattern_PatternList", "left");
+        public TreeSitter.Grammars.Python.AnonUnions.Pattern_PatternList Left => TreeSitter.Grammars.Python.AnonUnions.Pattern_PatternList.TryFrom(Node.ChildByFieldName("left")) ?? throw new global::TreeSitter.Typed.IncorrectNodeKindException(Node, "TreeSitter.Grammars.Python.AnonUnions.Pattern_PatternList");
 
         /// <summary>The required <c>operator</c> field.</summary>
         /// <exception cref="global::TreeSitter.Typed.IncorrectNodeKindException">The field is absent or has an unexpected kind.</exception>
-        public TreeSitter.Grammars.Python.AnonUnions.AnonUdbed48813ca19988 Operator => TreeSitter.Grammars.Python.AnonUnions.AnonUdbed48813ca19988.TryFrom(Node.ChildByFieldName("operator")) ?? throw new global::TreeSitter.Typed.IncorrectNodeKindException(Node, "TreeSitter.Grammars.Python.AnonUnions.AnonUdbed48813ca19988", "operator");
+        public TreeSitter.Grammars.Python.AnonUnions.AnonUdbed48813ca19988 Operator => TreeSitter.Grammars.Python.AnonUnions.AnonUdbed48813ca19988.TryFrom(Node.ChildByFieldName("operator")) ?? throw new global::TreeSitter.Typed.IncorrectNodeKindException(Node, "TreeSitter.Grammars.Python.AnonUnions.AnonUdbed48813ca19988");
 
         /// <summary>The required <c>right</c> field.</summary>
         /// <exception cref="global::TreeSitter.Typed.IncorrectNodeKindException">The field is absent or has an unexpected kind.</exception>
-        public TreeSitter.Grammars.Python.AnonUnions.Assignment_AugmentedAssignment_Expression_ExpressionList_PatternList_Yield Right => TreeSitter.Grammars.Python.AnonUnions.Assignment_AugmentedAssignment_Expression_ExpressionList_PatternList_Yield.TryFrom(Node.ChildByFieldName("right")) ?? throw new global::TreeSitter.Typed.IncorrectNodeKindException(Node, "TreeSitter.Grammars.Python.AnonUnions.Assignment_AugmentedAssignment_Expression_ExpressionList_PatternList_Yield", "right");
+        public TreeSitter.Grammars.Python.AnonUnions.Assignment_AugmentedAssignment_Expression_ExpressionList_PatternList_Yield Right => TreeSitter.Grammars.Python.AnonUnions.Assignment_AugmentedAssignment_Expression_ExpressionList_PatternList_Yield.TryFrom(Node.ChildByFieldName("right")) ?? throw new global::TreeSitter.Typed.IncorrectNodeKindException(Node, "TreeSitter.Grammars.Python.AnonUnions.Assignment_AugmentedAssignment_Expression_ExpressionList_PatternList_Yield");
 
     }
 
@@ -871,15 +871,15 @@ namespace TreeSitter.Grammars.Python
         }
         /// <summary>The required <c>left</c> field.</summary>
         /// <exception cref="global::TreeSitter.Typed.IncorrectNodeKindException">The field is absent or has an unexpected kind.</exception>
-        public TreeSitter.Grammars.Python.PrimaryExpression Left => TreeSitter.Grammars.Python.PrimaryExpression.TryFrom(Node.ChildByFieldName("left")) ?? throw new global::TreeSitter.Typed.IncorrectNodeKindException(Node, "TreeSitter.Grammars.Python.PrimaryExpression", "left");
+        public TreeSitter.Grammars.Python.PrimaryExpression Left => TreeSitter.Grammars.Python.PrimaryExpression.TryFrom(Node.ChildByFieldName("left")) ?? throw new global::TreeSitter.Typed.IncorrectNodeKindException(Node, "TreeSitter.Grammars.Python.PrimaryExpression");
 
         /// <summary>The required <c>operator</c> field.</summary>
         /// <exception cref="global::TreeSitter.Typed.IncorrectNodeKindException">The field is absent or has an unexpected kind.</exception>
-        public TreeSitter.Grammars.Python.AnonUnions.Amp_At_Caret_GtGt_LtLt_Minus_Percent_Pipe_Plus_Slash_SlashSlash_Star_StarStar Operator => TreeSitter.Grammars.Python.AnonUnions.Amp_At_Caret_GtGt_LtLt_Minus_Percent_Pipe_Plus_Slash_SlashSlash_Star_StarStar.TryFrom(Node.ChildByFieldName("operator")) ?? throw new global::TreeSitter.Typed.IncorrectNodeKindException(Node, "TreeSitter.Grammars.Python.AnonUnions.Amp_At_Caret_GtGt_LtLt_Minus_Percent_Pipe_Plus_Slash_SlashSlash_Star_StarStar", "operator");
+        public TreeSitter.Grammars.Python.AnonUnions.Amp_At_Caret_GtGt_LtLt_Minus_Percent_Pipe_Plus_Slash_SlashSlash_Star_StarStar Operator => TreeSitter.Grammars.Python.AnonUnions.Amp_At_Caret_GtGt_LtLt_Minus_Percent_Pipe_Plus_Slash_SlashSlash_Star_StarStar.TryFrom(Node.ChildByFieldName("operator")) ?? throw new global::TreeSitter.Typed.IncorrectNodeKindException(Node, "TreeSitter.Grammars.Python.AnonUnions.Amp_At_Caret_GtGt_LtLt_Minus_Percent_Pipe_Plus_Slash_SlashSlash_Star_StarStar");
 
         /// <summary>The required <c>right</c> field.</summary>
         /// <exception cref="global::TreeSitter.Typed.IncorrectNodeKindException">The field is absent or has an unexpected kind.</exception>
-        public TreeSitter.Grammars.Python.PrimaryExpression Right => TreeSitter.Grammars.Python.PrimaryExpression.TryFrom(Node.ChildByFieldName("right")) ?? throw new global::TreeSitter.Typed.IncorrectNodeKindException(Node, "TreeSitter.Grammars.Python.PrimaryExpression", "right");
+        public TreeSitter.Grammars.Python.PrimaryExpression Right => TreeSitter.Grammars.Python.PrimaryExpression.TryFrom(Node.ChildByFieldName("right")) ?? throw new global::TreeSitter.Typed.IncorrectNodeKindException(Node, "TreeSitter.Grammars.Python.PrimaryExpression");
 
     }
 
@@ -976,15 +976,15 @@ namespace TreeSitter.Grammars.Python
         }
         /// <summary>The required <c>left</c> field.</summary>
         /// <exception cref="global::TreeSitter.Typed.IncorrectNodeKindException">The field is absent or has an unexpected kind.</exception>
-        public TreeSitter.Grammars.Python.Expression Left => TreeSitter.Grammars.Python.Expression.TryFrom(Node.ChildByFieldName("left")) ?? throw new global::TreeSitter.Typed.IncorrectNodeKindException(Node, "TreeSitter.Grammars.Python.Expression", "left");
+        public TreeSitter.Grammars.Python.Expression Left => TreeSitter.Grammars.Python.Expression.TryFrom(Node.ChildByFieldName("left")) ?? throw new global::TreeSitter.Typed.IncorrectNodeKindException(Node, "TreeSitter.Grammars.Python.Expression");
 
         /// <summary>The required <c>operator</c> field.</summary>
         /// <exception cref="global::TreeSitter.Typed.IncorrectNodeKindException">The field is absent or has an unexpected kind.</exception>
-        public TreeSitter.Grammars.Python.AnonUnions.And_Or Operator => TreeSitter.Grammars.Python.AnonUnions.And_Or.TryFrom(Node.ChildByFieldName("operator")) ?? throw new global::TreeSitter.Typed.IncorrectNodeKindException(Node, "TreeSitter.Grammars.Python.AnonUnions.And_Or", "operator");
+        public TreeSitter.Grammars.Python.AnonUnions.And_Or Operator => TreeSitter.Grammars.Python.AnonUnions.And_Or.TryFrom(Node.ChildByFieldName("operator")) ?? throw new global::TreeSitter.Typed.IncorrectNodeKindException(Node, "TreeSitter.Grammars.Python.AnonUnions.And_Or");
 
         /// <summary>The required <c>right</c> field.</summary>
         /// <exception cref="global::TreeSitter.Typed.IncorrectNodeKindException">The field is absent or has an unexpected kind.</exception>
-        public TreeSitter.Grammars.Python.Expression Right => TreeSitter.Grammars.Python.Expression.TryFrom(Node.ChildByFieldName("right")) ?? throw new global::TreeSitter.Typed.IncorrectNodeKindException(Node, "TreeSitter.Grammars.Python.Expression", "right");
+        public TreeSitter.Grammars.Python.Expression Right => TreeSitter.Grammars.Python.Expression.TryFrom(Node.ChildByFieldName("right")) ?? throw new global::TreeSitter.Typed.IncorrectNodeKindException(Node, "TreeSitter.Grammars.Python.Expression");
 
     }
 
@@ -1056,11 +1056,11 @@ namespace TreeSitter.Grammars.Python
         }
         /// <summary>The required <c>arguments</c> field.</summary>
         /// <exception cref="global::TreeSitter.Typed.IncorrectNodeKindException">The field is absent or has an unexpected kind.</exception>
-        public TreeSitter.Grammars.Python.AnonUnions.ArgumentList_GeneratorExpression Arguments => TreeSitter.Grammars.Python.AnonUnions.ArgumentList_GeneratorExpression.TryFrom(Node.ChildByFieldName("arguments")) ?? throw new global::TreeSitter.Typed.IncorrectNodeKindException(Node, "TreeSitter.Grammars.Python.AnonUnions.ArgumentList_GeneratorExpression", "arguments");
+        public TreeSitter.Grammars.Python.AnonUnions.ArgumentList_GeneratorExpression Arguments => TreeSitter.Grammars.Python.AnonUnions.ArgumentList_GeneratorExpression.TryFrom(Node.ChildByFieldName("arguments")) ?? throw new global::TreeSitter.Typed.IncorrectNodeKindException(Node, "TreeSitter.Grammars.Python.AnonUnions.ArgumentList_GeneratorExpression");
 
         /// <summary>The required <c>function</c> field.</summary>
         /// <exception cref="global::TreeSitter.Typed.IncorrectNodeKindException">The field is absent or has an unexpected kind.</exception>
-        public TreeSitter.Grammars.Python.PrimaryExpression Function => TreeSitter.Grammars.Python.PrimaryExpression.TryFrom(Node.ChildByFieldName("function")) ?? throw new global::TreeSitter.Typed.IncorrectNodeKindException(Node, "TreeSitter.Grammars.Python.PrimaryExpression", "function");
+        public TreeSitter.Grammars.Python.PrimaryExpression Function => TreeSitter.Grammars.Python.PrimaryExpression.TryFrom(Node.ChildByFieldName("function")) ?? throw new global::TreeSitter.Typed.IncorrectNodeKindException(Node, "TreeSitter.Grammars.Python.PrimaryExpression");
 
     }
 
@@ -1098,7 +1098,7 @@ namespace TreeSitter.Grammars.Python
         }
         /// <summary>The required <c>consequence</c> field.</summary>
         /// <exception cref="global::TreeSitter.Typed.IncorrectNodeKindException">The field is absent or has an unexpected kind.</exception>
-        public TreeSitter.Grammars.Python.Block Consequence => TreeSitter.Grammars.Python.Block.TryFrom(Node.ChildByFieldName("consequence")) ?? throw new global::TreeSitter.Typed.IncorrectNodeKindException(Node, "TreeSitter.Grammars.Python.Block", "consequence");
+        public TreeSitter.Grammars.Python.Block Consequence => TreeSitter.Grammars.Python.Block.TryFrom(Node.ChildByFieldName("consequence")) ?? throw new global::TreeSitter.Typed.IncorrectNodeKindException(Node, "TreeSitter.Grammars.Python.Block");
 
         /// <summary>The optional <c>guard</c> field, or <see langword="null"/> when absent.</summary>
         public TreeSitter.Grammars.Python.IfClause? Guard => TreeSitter.Grammars.Python.IfClause.TryFrom(Node.ChildByFieldName("guard"));
@@ -1242,11 +1242,11 @@ namespace TreeSitter.Grammars.Python
         }
         /// <summary>The required <c>body</c> field.</summary>
         /// <exception cref="global::TreeSitter.Typed.IncorrectNodeKindException">The field is absent or has an unexpected kind.</exception>
-        public TreeSitter.Grammars.Python.Block Body => TreeSitter.Grammars.Python.Block.TryFrom(Node.ChildByFieldName("body")) ?? throw new global::TreeSitter.Typed.IncorrectNodeKindException(Node, "TreeSitter.Grammars.Python.Block", "body");
+        public TreeSitter.Grammars.Python.Block Body => TreeSitter.Grammars.Python.Block.TryFrom(Node.ChildByFieldName("body")) ?? throw new global::TreeSitter.Typed.IncorrectNodeKindException(Node, "TreeSitter.Grammars.Python.Block");
 
         /// <summary>The required <c>name</c> field.</summary>
         /// <exception cref="global::TreeSitter.Typed.IncorrectNodeKindException">The field is absent or has an unexpected kind.</exception>
-        public TreeSitter.Grammars.Python.Identifier Name => TreeSitter.Grammars.Python.Identifier.TryFrom(Node.ChildByFieldName("name")) ?? throw new global::TreeSitter.Typed.IncorrectNodeKindException(Node, "TreeSitter.Grammars.Python.Identifier", "name");
+        public TreeSitter.Grammars.Python.Identifier Name => TreeSitter.Grammars.Python.Identifier.TryFrom(Node.ChildByFieldName("name")) ?? throw new global::TreeSitter.Typed.IncorrectNodeKindException(Node, "TreeSitter.Grammars.Python.Identifier");
 
         /// <summary>The optional <c>superclasses</c> field, or <see langword="null"/> when absent.</summary>
         public TreeSitter.Grammars.Python.ArgumentList? Superclasses => TreeSitter.Grammars.Python.ArgumentList.TryFrom(Node.ChildByFieldName("superclasses"));
@@ -1647,7 +1647,7 @@ namespace TreeSitter.Grammars.Python
         }
         /// <summary>The required <c>definition</c> field.</summary>
         /// <exception cref="global::TreeSitter.Typed.IncorrectNodeKindException">The field is absent or has an unexpected kind.</exception>
-        public TreeSitter.Grammars.Python.AnonUnions.ClassDefinition_FunctionDefinition Definition => TreeSitter.Grammars.Python.AnonUnions.ClassDefinition_FunctionDefinition.TryFrom(Node.ChildByFieldName("definition")) ?? throw new global::TreeSitter.Typed.IncorrectNodeKindException(Node, "TreeSitter.Grammars.Python.AnonUnions.ClassDefinition_FunctionDefinition", "definition");
+        public TreeSitter.Grammars.Python.AnonUnions.ClassDefinition_FunctionDefinition Definition => TreeSitter.Grammars.Python.AnonUnions.ClassDefinition_FunctionDefinition.TryFrom(Node.ChildByFieldName("definition")) ?? throw new global::TreeSitter.Typed.IncorrectNodeKindException(Node, "TreeSitter.Grammars.Python.AnonUnions.ClassDefinition_FunctionDefinition");
 
         /// <summary>The unnamed children (zero or more), with extras filtered out.</summary>
         public global::System.Collections.Generic.IEnumerable<TreeSitter.Grammars.Python.Decorator> Decorators
@@ -1743,11 +1743,11 @@ namespace TreeSitter.Grammars.Python
         }
         /// <summary>The required <c>name</c> field.</summary>
         /// <exception cref="global::TreeSitter.Typed.IncorrectNodeKindException">The field is absent or has an unexpected kind.</exception>
-        public TreeSitter.Grammars.Python.AnonUnions.Identifier_TuplePattern Name => TreeSitter.Grammars.Python.AnonUnions.Identifier_TuplePattern.TryFrom(Node.ChildByFieldName("name")) ?? throw new global::TreeSitter.Typed.IncorrectNodeKindException(Node, "TreeSitter.Grammars.Python.AnonUnions.Identifier_TuplePattern", "name");
+        public TreeSitter.Grammars.Python.AnonUnions.Identifier_TuplePattern Name => TreeSitter.Grammars.Python.AnonUnions.Identifier_TuplePattern.TryFrom(Node.ChildByFieldName("name")) ?? throw new global::TreeSitter.Typed.IncorrectNodeKindException(Node, "TreeSitter.Grammars.Python.AnonUnions.Identifier_TuplePattern");
 
         /// <summary>The required <c>value</c> field.</summary>
         /// <exception cref="global::TreeSitter.Typed.IncorrectNodeKindException">The field is absent or has an unexpected kind.</exception>
-        public TreeSitter.Grammars.Python.Expression Value => TreeSitter.Grammars.Python.Expression.TryFrom(Node.ChildByFieldName("value")) ?? throw new global::TreeSitter.Typed.IncorrectNodeKindException(Node, "TreeSitter.Grammars.Python.Expression", "value");
+        public TreeSitter.Grammars.Python.Expression Value => TreeSitter.Grammars.Python.Expression.TryFrom(Node.ChildByFieldName("value")) ?? throw new global::TreeSitter.Typed.IncorrectNodeKindException(Node, "TreeSitter.Grammars.Python.Expression");
 
     }
 
@@ -1949,7 +1949,7 @@ namespace TreeSitter.Grammars.Python
         }
         /// <summary>The required <c>body</c> field.</summary>
         /// <exception cref="global::TreeSitter.Typed.IncorrectNodeKindException">The field is absent or has an unexpected kind.</exception>
-        public TreeSitter.Grammars.Python.Pair Body => TreeSitter.Grammars.Python.Pair.TryFrom(Node.ChildByFieldName("body")) ?? throw new global::TreeSitter.Typed.IncorrectNodeKindException(Node, "TreeSitter.Grammars.Python.Pair", "body");
+        public TreeSitter.Grammars.Python.Pair Body => TreeSitter.Grammars.Python.Pair.TryFrom(Node.ChildByFieldName("body")) ?? throw new global::TreeSitter.Typed.IncorrectNodeKindException(Node, "TreeSitter.Grammars.Python.Pair");
 
         /// <summary>The unnamed children (zero or more), with extras filtered out.</summary>
         public global::System.Collections.Generic.IEnumerable<TreeSitter.Grammars.Python.AnonUnions.ForInClause_IfClause> Children
@@ -2137,11 +2137,11 @@ namespace TreeSitter.Grammars.Python
         }
         /// <summary>The required <c>condition</c> field.</summary>
         /// <exception cref="global::TreeSitter.Typed.IncorrectNodeKindException">The field is absent or has an unexpected kind.</exception>
-        public TreeSitter.Grammars.Python.Expression Condition => TreeSitter.Grammars.Python.Expression.TryFrom(Node.ChildByFieldName("condition")) ?? throw new global::TreeSitter.Typed.IncorrectNodeKindException(Node, "TreeSitter.Grammars.Python.Expression", "condition");
+        public TreeSitter.Grammars.Python.Expression Condition => TreeSitter.Grammars.Python.Expression.TryFrom(Node.ChildByFieldName("condition")) ?? throw new global::TreeSitter.Typed.IncorrectNodeKindException(Node, "TreeSitter.Grammars.Python.Expression");
 
         /// <summary>The required <c>consequence</c> field.</summary>
         /// <exception cref="global::TreeSitter.Typed.IncorrectNodeKindException">The field is absent or has an unexpected kind.</exception>
-        public TreeSitter.Grammars.Python.Block Consequence => TreeSitter.Grammars.Python.Block.TryFrom(Node.ChildByFieldName("consequence")) ?? throw new global::TreeSitter.Typed.IncorrectNodeKindException(Node, "TreeSitter.Grammars.Python.Block", "consequence");
+        public TreeSitter.Grammars.Python.Block Consequence => TreeSitter.Grammars.Python.Block.TryFrom(Node.ChildByFieldName("consequence")) ?? throw new global::TreeSitter.Typed.IncorrectNodeKindException(Node, "TreeSitter.Grammars.Python.Block");
 
     }
 
@@ -2213,7 +2213,7 @@ namespace TreeSitter.Grammars.Python
         }
         /// <summary>The required <c>body</c> field.</summary>
         /// <exception cref="global::TreeSitter.Typed.IncorrectNodeKindException">The field is absent or has an unexpected kind.</exception>
-        public TreeSitter.Grammars.Python.Block Body => TreeSitter.Grammars.Python.Block.TryFrom(Node.ChildByFieldName("body")) ?? throw new global::TreeSitter.Typed.IncorrectNodeKindException(Node, "TreeSitter.Grammars.Python.Block", "body");
+        public TreeSitter.Grammars.Python.Block Body => TreeSitter.Grammars.Python.Block.TryFrom(Node.ChildByFieldName("body")) ?? throw new global::TreeSitter.Typed.IncorrectNodeKindException(Node, "TreeSitter.Grammars.Python.Block");
 
     }
 
@@ -2381,7 +2381,7 @@ namespace TreeSitter.Grammars.Python
         }
         /// <summary>The required <c>code</c> field.</summary>
         /// <exception cref="global::TreeSitter.Typed.IncorrectNodeKindException">The field is absent or has an unexpected kind.</exception>
-        public TreeSitter.Grammars.Python.AnonUnions.Identifier_String Code => TreeSitter.Grammars.Python.AnonUnions.Identifier_String.TryFrom(Node.ChildByFieldName("code")) ?? throw new global::TreeSitter.Typed.IncorrectNodeKindException(Node, "TreeSitter.Grammars.Python.AnonUnions.Identifier_String", "code");
+        public TreeSitter.Grammars.Python.AnonUnions.Identifier_String Code => TreeSitter.Grammars.Python.AnonUnions.Identifier_String.TryFrom(Node.ChildByFieldName("code")) ?? throw new global::TreeSitter.Typed.IncorrectNodeKindException(Node, "TreeSitter.Grammars.Python.AnonUnions.Identifier_String");
 
         /// <summary>The unnamed children (zero or more), with extras filtered out.</summary>
         public global::System.Collections.Generic.IEnumerable<TreeSitter.Grammars.Python.Expression> Expressions
@@ -2956,7 +2956,7 @@ namespace TreeSitter.Grammars.Python
         }
         /// <summary>The required <c>left</c> field.</summary>
         /// <exception cref="global::TreeSitter.Typed.IncorrectNodeKindException">The field is absent or has an unexpected kind.</exception>
-        public TreeSitter.Grammars.Python.AnonUnions.Pattern_PatternList Left => TreeSitter.Grammars.Python.AnonUnions.Pattern_PatternList.TryFrom(Node.ChildByFieldName("left")) ?? throw new global::TreeSitter.Typed.IncorrectNodeKindException(Node, "TreeSitter.Grammars.Python.AnonUnions.Pattern_PatternList", "left");
+        public TreeSitter.Grammars.Python.AnonUnions.Pattern_PatternList Left => TreeSitter.Grammars.Python.AnonUnions.Pattern_PatternList.TryFrom(Node.ChildByFieldName("left")) ?? throw new global::TreeSitter.Typed.IncorrectNodeKindException(Node, "TreeSitter.Grammars.Python.AnonUnions.Pattern_PatternList");
 
         /// <summary>The <c>right</c> field (zero or more), with extras filtered out.</summary>
         public global::System.Collections.Generic.IEnumerable<TreeSitter.Grammars.Python.AnonUnions.Expression_Comma> Right
@@ -3010,15 +3010,15 @@ namespace TreeSitter.Grammars.Python
 
         /// <summary>The required <c>body</c> field.</summary>
         /// <exception cref="global::TreeSitter.Typed.IncorrectNodeKindException">The field is absent or has an unexpected kind.</exception>
-        public TreeSitter.Grammars.Python.Block Body => TreeSitter.Grammars.Python.Block.TryFrom(Node.ChildByFieldName("body")) ?? throw new global::TreeSitter.Typed.IncorrectNodeKindException(Node, "TreeSitter.Grammars.Python.Block", "body");
+        public TreeSitter.Grammars.Python.Block Body => TreeSitter.Grammars.Python.Block.TryFrom(Node.ChildByFieldName("body")) ?? throw new global::TreeSitter.Typed.IncorrectNodeKindException(Node, "TreeSitter.Grammars.Python.Block");
 
         /// <summary>The required <c>left</c> field.</summary>
         /// <exception cref="global::TreeSitter.Typed.IncorrectNodeKindException">The field is absent or has an unexpected kind.</exception>
-        public TreeSitter.Grammars.Python.AnonUnions.Pattern_PatternList Left => TreeSitter.Grammars.Python.AnonUnions.Pattern_PatternList.TryFrom(Node.ChildByFieldName("left")) ?? throw new global::TreeSitter.Typed.IncorrectNodeKindException(Node, "TreeSitter.Grammars.Python.AnonUnions.Pattern_PatternList", "left");
+        public TreeSitter.Grammars.Python.AnonUnions.Pattern_PatternList Left => TreeSitter.Grammars.Python.AnonUnions.Pattern_PatternList.TryFrom(Node.ChildByFieldName("left")) ?? throw new global::TreeSitter.Typed.IncorrectNodeKindException(Node, "TreeSitter.Grammars.Python.AnonUnions.Pattern_PatternList");
 
         /// <summary>The required <c>right</c> field.</summary>
         /// <exception cref="global::TreeSitter.Typed.IncorrectNodeKindException">The field is absent or has an unexpected kind.</exception>
-        public TreeSitter.Grammars.Python.AnonUnions.Expression_ExpressionList Right => TreeSitter.Grammars.Python.AnonUnions.Expression_ExpressionList.TryFrom(Node.ChildByFieldName("right")) ?? throw new global::TreeSitter.Typed.IncorrectNodeKindException(Node, "TreeSitter.Grammars.Python.AnonUnions.Expression_ExpressionList", "right");
+        public TreeSitter.Grammars.Python.AnonUnions.Expression_ExpressionList Right => TreeSitter.Grammars.Python.AnonUnions.Expression_ExpressionList.TryFrom(Node.ChildByFieldName("right")) ?? throw new global::TreeSitter.Typed.IncorrectNodeKindException(Node, "TreeSitter.Grammars.Python.AnonUnions.Expression_ExpressionList");
 
     }
 
@@ -3056,7 +3056,7 @@ namespace TreeSitter.Grammars.Python
         }
         /// <summary>The required <c>expression</c> field.</summary>
         /// <exception cref="global::TreeSitter.Typed.IncorrectNodeKindException">The field is absent or has an unexpected kind.</exception>
-        public TreeSitter.Grammars.Python.AnonUnions.Expression_ExpressionList_PatternList_Yield Expression => TreeSitter.Grammars.Python.AnonUnions.Expression_ExpressionList_PatternList_Yield.TryFrom(Node.ChildByFieldName("expression")) ?? throw new global::TreeSitter.Typed.IncorrectNodeKindException(Node, "TreeSitter.Grammars.Python.AnonUnions.Expression_ExpressionList_PatternList_Yield", "expression");
+        public TreeSitter.Grammars.Python.AnonUnions.Expression_ExpressionList_PatternList_Yield Expression => TreeSitter.Grammars.Python.AnonUnions.Expression_ExpressionList_PatternList_Yield.TryFrom(Node.ChildByFieldName("expression")) ?? throw new global::TreeSitter.Typed.IncorrectNodeKindException(Node, "TreeSitter.Grammars.Python.AnonUnions.Expression_ExpressionList_PatternList_Yield");
 
         /// <summary>The optional <c>format_specifier</c> field, or <see langword="null"/> when absent.</summary>
         public TreeSitter.Grammars.Python.FormatSpecifier? FormatSpecifier => TreeSitter.Grammars.Python.FormatSpecifier.TryFrom(Node.ChildByFieldName("format_specifier"));
@@ -3146,15 +3146,15 @@ namespace TreeSitter.Grammars.Python
         }
         /// <summary>The required <c>body</c> field.</summary>
         /// <exception cref="global::TreeSitter.Typed.IncorrectNodeKindException">The field is absent or has an unexpected kind.</exception>
-        public TreeSitter.Grammars.Python.Block Body => TreeSitter.Grammars.Python.Block.TryFrom(Node.ChildByFieldName("body")) ?? throw new global::TreeSitter.Typed.IncorrectNodeKindException(Node, "TreeSitter.Grammars.Python.Block", "body");
+        public TreeSitter.Grammars.Python.Block Body => TreeSitter.Grammars.Python.Block.TryFrom(Node.ChildByFieldName("body")) ?? throw new global::TreeSitter.Typed.IncorrectNodeKindException(Node, "TreeSitter.Grammars.Python.Block");
 
         /// <summary>The required <c>name</c> field.</summary>
         /// <exception cref="global::TreeSitter.Typed.IncorrectNodeKindException">The field is absent or has an unexpected kind.</exception>
-        public TreeSitter.Grammars.Python.Identifier Name => TreeSitter.Grammars.Python.Identifier.TryFrom(Node.ChildByFieldName("name")) ?? throw new global::TreeSitter.Typed.IncorrectNodeKindException(Node, "TreeSitter.Grammars.Python.Identifier", "name");
+        public TreeSitter.Grammars.Python.Identifier Name => TreeSitter.Grammars.Python.Identifier.TryFrom(Node.ChildByFieldName("name")) ?? throw new global::TreeSitter.Typed.IncorrectNodeKindException(Node, "TreeSitter.Grammars.Python.Identifier");
 
         /// <summary>The required <c>parameters</c> field.</summary>
         /// <exception cref="global::TreeSitter.Typed.IncorrectNodeKindException">The field is absent or has an unexpected kind.</exception>
-        public TreeSitter.Grammars.Python.Parameters Parameters => TreeSitter.Grammars.Python.Parameters.TryFrom(Node.ChildByFieldName("parameters")) ?? throw new global::TreeSitter.Typed.IncorrectNodeKindException(Node, "TreeSitter.Grammars.Python.Parameters", "parameters");
+        public TreeSitter.Grammars.Python.Parameters Parameters => TreeSitter.Grammars.Python.Parameters.TryFrom(Node.ChildByFieldName("parameters")) ?? throw new global::TreeSitter.Typed.IncorrectNodeKindException(Node, "TreeSitter.Grammars.Python.Parameters");
 
         /// <summary>The optional <c>return_type</c> field, or <see langword="null"/> when absent.</summary>
         public TreeSitter.Grammars.Python.Type? ReturnType => TreeSitter.Grammars.Python.Type.TryFrom(Node.ChildByFieldName("return_type"));
@@ -3245,7 +3245,7 @@ namespace TreeSitter.Grammars.Python
         }
         /// <summary>The required <c>body</c> field.</summary>
         /// <exception cref="global::TreeSitter.Typed.IncorrectNodeKindException">The field is absent or has an unexpected kind.</exception>
-        public TreeSitter.Grammars.Python.Expression Body => TreeSitter.Grammars.Python.Expression.TryFrom(Node.ChildByFieldName("body")) ?? throw new global::TreeSitter.Typed.IncorrectNodeKindException(Node, "TreeSitter.Grammars.Python.Expression", "body");
+        public TreeSitter.Grammars.Python.Expression Body => TreeSitter.Grammars.Python.Expression.TryFrom(Node.ChildByFieldName("body")) ?? throw new global::TreeSitter.Typed.IncorrectNodeKindException(Node, "TreeSitter.Grammars.Python.Expression");
 
         /// <summary>The unnamed children (zero or more), with extras filtered out.</summary>
         public global::System.Collections.Generic.IEnumerable<TreeSitter.Grammars.Python.AnonUnions.ForInClause_IfClause> Children
@@ -3480,11 +3480,11 @@ namespace TreeSitter.Grammars.Python
 
         /// <summary>The required <c>condition</c> field.</summary>
         /// <exception cref="global::TreeSitter.Typed.IncorrectNodeKindException">The field is absent or has an unexpected kind.</exception>
-        public TreeSitter.Grammars.Python.Expression Condition => TreeSitter.Grammars.Python.Expression.TryFrom(Node.ChildByFieldName("condition")) ?? throw new global::TreeSitter.Typed.IncorrectNodeKindException(Node, "TreeSitter.Grammars.Python.Expression", "condition");
+        public TreeSitter.Grammars.Python.Expression Condition => TreeSitter.Grammars.Python.Expression.TryFrom(Node.ChildByFieldName("condition")) ?? throw new global::TreeSitter.Typed.IncorrectNodeKindException(Node, "TreeSitter.Grammars.Python.Expression");
 
         /// <summary>The required <c>consequence</c> field.</summary>
         /// <exception cref="global::TreeSitter.Typed.IncorrectNodeKindException">The field is absent or has an unexpected kind.</exception>
-        public TreeSitter.Grammars.Python.Block Consequence => TreeSitter.Grammars.Python.Block.TryFrom(Node.ChildByFieldName("consequence")) ?? throw new global::TreeSitter.Typed.IncorrectNodeKindException(Node, "TreeSitter.Grammars.Python.Block", "consequence");
+        public TreeSitter.Grammars.Python.Block Consequence => TreeSitter.Grammars.Python.Block.TryFrom(Node.ChildByFieldName("consequence")) ?? throw new global::TreeSitter.Typed.IncorrectNodeKindException(Node, "TreeSitter.Grammars.Python.Block");
 
     }
 
@@ -3522,7 +3522,7 @@ namespace TreeSitter.Grammars.Python
         }
         /// <summary>The required <c>module_name</c> field.</summary>
         /// <exception cref="global::TreeSitter.Typed.IncorrectNodeKindException">The field is absent or has an unexpected kind.</exception>
-        public TreeSitter.Grammars.Python.AnonUnions.DottedName_RelativeImport ModuleName => TreeSitter.Grammars.Python.AnonUnions.DottedName_RelativeImport.TryFrom(Node.ChildByFieldName("module_name")) ?? throw new global::TreeSitter.Typed.IncorrectNodeKindException(Node, "TreeSitter.Grammars.Python.AnonUnions.DottedName_RelativeImport", "module_name");
+        public TreeSitter.Grammars.Python.AnonUnions.DottedName_RelativeImport ModuleName => TreeSitter.Grammars.Python.AnonUnions.DottedName_RelativeImport.TryFrom(Node.ChildByFieldName("module_name")) ?? throw new global::TreeSitter.Typed.IncorrectNodeKindException(Node, "TreeSitter.Grammars.Python.AnonUnions.DottedName_RelativeImport");
 
         /// <summary>The <c>name</c> field (zero or more), with extras filtered out.</summary>
         public global::System.Collections.Generic.IEnumerable<TreeSitter.Grammars.Python.AnonUnions.AliasedImport_DottedName> Name
@@ -3699,7 +3699,7 @@ namespace TreeSitter.Grammars.Python
         }
         /// <summary>The required <c>expression</c> field.</summary>
         /// <exception cref="global::TreeSitter.Typed.IncorrectNodeKindException">The field is absent or has an unexpected kind.</exception>
-        public TreeSitter.Grammars.Python.AnonUnions.Expression_ExpressionList_PatternList_Yield Expression => TreeSitter.Grammars.Python.AnonUnions.Expression_ExpressionList_PatternList_Yield.TryFrom(Node.ChildByFieldName("expression")) ?? throw new global::TreeSitter.Typed.IncorrectNodeKindException(Node, "TreeSitter.Grammars.Python.AnonUnions.Expression_ExpressionList_PatternList_Yield", "expression");
+        public TreeSitter.Grammars.Python.AnonUnions.Expression_ExpressionList_PatternList_Yield Expression => TreeSitter.Grammars.Python.AnonUnions.Expression_ExpressionList_PatternList_Yield.TryFrom(Node.ChildByFieldName("expression")) ?? throw new global::TreeSitter.Typed.IncorrectNodeKindException(Node, "TreeSitter.Grammars.Python.AnonUnions.Expression_ExpressionList_PatternList_Yield");
 
         /// <summary>The optional <c>format_specifier</c> field, or <see langword="null"/> when absent.</summary>
         public TreeSitter.Grammars.Python.FormatSpecifier? FormatSpecifier => TreeSitter.Grammars.Python.FormatSpecifier.TryFrom(Node.ChildByFieldName("format_specifier"));
@@ -3743,11 +3743,11 @@ namespace TreeSitter.Grammars.Python
         }
         /// <summary>The required <c>name</c> field.</summary>
         /// <exception cref="global::TreeSitter.Typed.IncorrectNodeKindException">The field is absent or has an unexpected kind.</exception>
-        public TreeSitter.Grammars.Python.Identifier Name => TreeSitter.Grammars.Python.Identifier.TryFrom(Node.ChildByFieldName("name")) ?? throw new global::TreeSitter.Typed.IncorrectNodeKindException(Node, "TreeSitter.Grammars.Python.Identifier", "name");
+        public TreeSitter.Grammars.Python.Identifier Name => TreeSitter.Grammars.Python.Identifier.TryFrom(Node.ChildByFieldName("name")) ?? throw new global::TreeSitter.Typed.IncorrectNodeKindException(Node, "TreeSitter.Grammars.Python.Identifier");
 
         /// <summary>The required <c>value</c> field.</summary>
         /// <exception cref="global::TreeSitter.Typed.IncorrectNodeKindException">The field is absent or has an unexpected kind.</exception>
-        public TreeSitter.Grammars.Python.Expression Value => TreeSitter.Grammars.Python.Expression.TryFrom(Node.ChildByFieldName("value")) ?? throw new global::TreeSitter.Typed.IncorrectNodeKindException(Node, "TreeSitter.Grammars.Python.Expression", "value");
+        public TreeSitter.Grammars.Python.Expression Value => TreeSitter.Grammars.Python.Expression.TryFrom(Node.ChildByFieldName("value")) ?? throw new global::TreeSitter.Typed.IncorrectNodeKindException(Node, "TreeSitter.Grammars.Python.Expression");
 
     }
 
@@ -3865,7 +3865,7 @@ namespace TreeSitter.Grammars.Python
         }
         /// <summary>The required <c>body</c> field.</summary>
         /// <exception cref="global::TreeSitter.Typed.IncorrectNodeKindException">The field is absent or has an unexpected kind.</exception>
-        public TreeSitter.Grammars.Python.Expression Body => TreeSitter.Grammars.Python.Expression.TryFrom(Node.ChildByFieldName("body")) ?? throw new global::TreeSitter.Typed.IncorrectNodeKindException(Node, "TreeSitter.Grammars.Python.Expression", "body");
+        public TreeSitter.Grammars.Python.Expression Body => TreeSitter.Grammars.Python.Expression.TryFrom(Node.ChildByFieldName("body")) ?? throw new global::TreeSitter.Typed.IncorrectNodeKindException(Node, "TreeSitter.Grammars.Python.Expression");
 
         /// <summary>The optional <c>parameters</c> field, or <see langword="null"/> when absent.</summary>
         public TreeSitter.Grammars.Python.LambdaParameters? Parameters => TreeSitter.Grammars.Python.LambdaParameters.TryFrom(Node.ChildByFieldName("parameters"));
@@ -4032,7 +4032,7 @@ namespace TreeSitter.Grammars.Python
         }
         /// <summary>The required <c>body</c> field.</summary>
         /// <exception cref="global::TreeSitter.Typed.IncorrectNodeKindException">The field is absent or has an unexpected kind.</exception>
-        public TreeSitter.Grammars.Python.Expression Body => TreeSitter.Grammars.Python.Expression.TryFrom(Node.ChildByFieldName("body")) ?? throw new global::TreeSitter.Typed.IncorrectNodeKindException(Node, "TreeSitter.Grammars.Python.Expression", "body");
+        public TreeSitter.Grammars.Python.Expression Body => TreeSitter.Grammars.Python.Expression.TryFrom(Node.ChildByFieldName("body")) ?? throw new global::TreeSitter.Typed.IncorrectNodeKindException(Node, "TreeSitter.Grammars.Python.Expression");
 
         /// <summary>The unnamed children (zero or more), with extras filtered out.</summary>
         public global::System.Collections.Generic.IEnumerable<TreeSitter.Grammars.Python.AnonUnions.ForInClause_IfClause> Children
@@ -4220,7 +4220,7 @@ namespace TreeSitter.Grammars.Python
         }
         /// <summary>The required <c>body</c> field.</summary>
         /// <exception cref="global::TreeSitter.Typed.IncorrectNodeKindException">The field is absent or has an unexpected kind.</exception>
-        public TreeSitter.Grammars.Python.Block Body => TreeSitter.Grammars.Python.Block.TryFrom(Node.ChildByFieldName("body")) ?? throw new global::TreeSitter.Typed.IncorrectNodeKindException(Node, "TreeSitter.Grammars.Python.Block", "body");
+        public TreeSitter.Grammars.Python.Block Body => TreeSitter.Grammars.Python.Block.TryFrom(Node.ChildByFieldName("body")) ?? throw new global::TreeSitter.Typed.IncorrectNodeKindException(Node, "TreeSitter.Grammars.Python.Block");
 
         /// <summary>The <c>subject</c> field (zero or more), with extras filtered out.</summary>
         public global::System.Collections.Generic.IEnumerable<TreeSitter.Grammars.Python.Expression> Subject
@@ -4363,11 +4363,11 @@ namespace TreeSitter.Grammars.Python
         }
         /// <summary>The required <c>name</c> field.</summary>
         /// <exception cref="global::TreeSitter.Typed.IncorrectNodeKindException">The field is absent or has an unexpected kind.</exception>
-        public TreeSitter.Grammars.Python.Identifier Name => TreeSitter.Grammars.Python.Identifier.TryFrom(Node.ChildByFieldName("name")) ?? throw new global::TreeSitter.Typed.IncorrectNodeKindException(Node, "TreeSitter.Grammars.Python.Identifier", "name");
+        public TreeSitter.Grammars.Python.Identifier Name => TreeSitter.Grammars.Python.Identifier.TryFrom(Node.ChildByFieldName("name")) ?? throw new global::TreeSitter.Typed.IncorrectNodeKindException(Node, "TreeSitter.Grammars.Python.Identifier");
 
         /// <summary>The required <c>value</c> field.</summary>
         /// <exception cref="global::TreeSitter.Typed.IncorrectNodeKindException">The field is absent or has an unexpected kind.</exception>
-        public TreeSitter.Grammars.Python.Expression Value => TreeSitter.Grammars.Python.Expression.TryFrom(Node.ChildByFieldName("value")) ?? throw new global::TreeSitter.Typed.IncorrectNodeKindException(Node, "TreeSitter.Grammars.Python.Expression", "value");
+        public TreeSitter.Grammars.Python.Expression Value => TreeSitter.Grammars.Python.Expression.TryFrom(Node.ChildByFieldName("value")) ?? throw new global::TreeSitter.Typed.IncorrectNodeKindException(Node, "TreeSitter.Grammars.Python.Expression");
 
     }
 
@@ -4485,7 +4485,7 @@ namespace TreeSitter.Grammars.Python
         }
         /// <summary>The required <c>argument</c> field.</summary>
         /// <exception cref="global::TreeSitter.Typed.IncorrectNodeKindException">The field is absent or has an unexpected kind.</exception>
-        public TreeSitter.Grammars.Python.Expression Argument => TreeSitter.Grammars.Python.Expression.TryFrom(Node.ChildByFieldName("argument")) ?? throw new global::TreeSitter.Typed.IncorrectNodeKindException(Node, "TreeSitter.Grammars.Python.Expression", "argument");
+        public TreeSitter.Grammars.Python.Expression Argument => TreeSitter.Grammars.Python.Expression.TryFrom(Node.ChildByFieldName("argument")) ?? throw new global::TreeSitter.Typed.IncorrectNodeKindException(Node, "TreeSitter.Grammars.Python.Expression");
 
     }
 
@@ -4523,11 +4523,11 @@ namespace TreeSitter.Grammars.Python
         }
         /// <summary>The required <c>key</c> field.</summary>
         /// <exception cref="global::TreeSitter.Typed.IncorrectNodeKindException">The field is absent or has an unexpected kind.</exception>
-        public TreeSitter.Grammars.Python.Expression Key => TreeSitter.Grammars.Python.Expression.TryFrom(Node.ChildByFieldName("key")) ?? throw new global::TreeSitter.Typed.IncorrectNodeKindException(Node, "TreeSitter.Grammars.Python.Expression", "key");
+        public TreeSitter.Grammars.Python.Expression Key => TreeSitter.Grammars.Python.Expression.TryFrom(Node.ChildByFieldName("key")) ?? throw new global::TreeSitter.Typed.IncorrectNodeKindException(Node, "TreeSitter.Grammars.Python.Expression");
 
         /// <summary>The required <c>value</c> field.</summary>
         /// <exception cref="global::TreeSitter.Typed.IncorrectNodeKindException">The field is absent or has an unexpected kind.</exception>
-        public TreeSitter.Grammars.Python.Expression Value => TreeSitter.Grammars.Python.Expression.TryFrom(Node.ChildByFieldName("value")) ?? throw new global::TreeSitter.Typed.IncorrectNodeKindException(Node, "TreeSitter.Grammars.Python.Expression", "value");
+        public TreeSitter.Grammars.Python.Expression Value => TreeSitter.Grammars.Python.Expression.TryFrom(Node.ChildByFieldName("value")) ?? throw new global::TreeSitter.Typed.IncorrectNodeKindException(Node, "TreeSitter.Grammars.Python.Expression");
 
     }
 
@@ -5627,7 +5627,7 @@ namespace TreeSitter.Grammars.Python
         }
         /// <summary>The required <c>body</c> field.</summary>
         /// <exception cref="global::TreeSitter.Typed.IncorrectNodeKindException">The field is absent or has an unexpected kind.</exception>
-        public TreeSitter.Grammars.Python.Expression Body => TreeSitter.Grammars.Python.Expression.TryFrom(Node.ChildByFieldName("body")) ?? throw new global::TreeSitter.Typed.IncorrectNodeKindException(Node, "TreeSitter.Grammars.Python.Expression", "body");
+        public TreeSitter.Grammars.Python.Expression Body => TreeSitter.Grammars.Python.Expression.TryFrom(Node.ChildByFieldName("body")) ?? throw new global::TreeSitter.Typed.IncorrectNodeKindException(Node, "TreeSitter.Grammars.Python.Expression");
 
         /// <summary>The unnamed children (zero or more), with extras filtered out.</summary>
         public global::System.Collections.Generic.IEnumerable<TreeSitter.Grammars.Python.AnonUnions.ForInClause_IfClause> Children
@@ -5987,7 +5987,7 @@ namespace TreeSitter.Grammars.Python
 
         /// <summary>The required <c>value</c> field.</summary>
         /// <exception cref="global::TreeSitter.Typed.IncorrectNodeKindException">The field is absent or has an unexpected kind.</exception>
-        public TreeSitter.Grammars.Python.PrimaryExpression Value => TreeSitter.Grammars.Python.PrimaryExpression.TryFrom(Node.ChildByFieldName("value")) ?? throw new global::TreeSitter.Typed.IncorrectNodeKindException(Node, "TreeSitter.Grammars.Python.PrimaryExpression", "value");
+        public TreeSitter.Grammars.Python.PrimaryExpression Value => TreeSitter.Grammars.Python.PrimaryExpression.TryFrom(Node.ChildByFieldName("value")) ?? throw new global::TreeSitter.Typed.IncorrectNodeKindException(Node, "TreeSitter.Grammars.Python.PrimaryExpression");
 
     }
 
@@ -6059,7 +6059,7 @@ namespace TreeSitter.Grammars.Python
         }
         /// <summary>The required <c>body</c> field.</summary>
         /// <exception cref="global::TreeSitter.Typed.IncorrectNodeKindException">The field is absent or has an unexpected kind.</exception>
-        public TreeSitter.Grammars.Python.Block Body => TreeSitter.Grammars.Python.Block.TryFrom(Node.ChildByFieldName("body")) ?? throw new global::TreeSitter.Typed.IncorrectNodeKindException(Node, "TreeSitter.Grammars.Python.Block", "body");
+        public TreeSitter.Grammars.Python.Block Body => TreeSitter.Grammars.Python.Block.TryFrom(Node.ChildByFieldName("body")) ?? throw new global::TreeSitter.Typed.IncorrectNodeKindException(Node, "TreeSitter.Grammars.Python.Block");
 
         /// <summary>The unnamed children (zero or more), with extras filtered out.</summary>
         public global::System.Collections.Generic.IEnumerable<TreeSitter.Grammars.Python.AnonUnions.ElseClause_ExceptClause_FinallyClause> Children
@@ -6293,11 +6293,11 @@ namespace TreeSitter.Grammars.Python
         }
         /// <summary>The required <c>left</c> field.</summary>
         /// <exception cref="global::TreeSitter.Typed.IncorrectNodeKindException">The field is absent or has an unexpected kind.</exception>
-        public TreeSitter.Grammars.Python.Type Left => TreeSitter.Grammars.Python.Type.TryFrom(Node.ChildByFieldName("left")) ?? throw new global::TreeSitter.Typed.IncorrectNodeKindException(Node, "TreeSitter.Grammars.Python.Type", "left");
+        public TreeSitter.Grammars.Python.Type Left => TreeSitter.Grammars.Python.Type.TryFrom(Node.ChildByFieldName("left")) ?? throw new global::TreeSitter.Typed.IncorrectNodeKindException(Node, "TreeSitter.Grammars.Python.Type");
 
         /// <summary>The required <c>right</c> field.</summary>
         /// <exception cref="global::TreeSitter.Typed.IncorrectNodeKindException">The field is absent or has an unexpected kind.</exception>
-        public TreeSitter.Grammars.Python.Type Right => TreeSitter.Grammars.Python.Type.TryFrom(Node.ChildByFieldName("right")) ?? throw new global::TreeSitter.Typed.IncorrectNodeKindException(Node, "TreeSitter.Grammars.Python.Type", "right");
+        public TreeSitter.Grammars.Python.Type Right => TreeSitter.Grammars.Python.Type.TryFrom(Node.ChildByFieldName("right")) ?? throw new global::TreeSitter.Typed.IncorrectNodeKindException(Node, "TreeSitter.Grammars.Python.Type");
 
     }
 
@@ -6415,15 +6415,15 @@ namespace TreeSitter.Grammars.Python
         }
         /// <summary>The required <c>name</c> field.</summary>
         /// <exception cref="global::TreeSitter.Typed.IncorrectNodeKindException">The field is absent or has an unexpected kind.</exception>
-        public TreeSitter.Grammars.Python.Identifier Name => TreeSitter.Grammars.Python.Identifier.TryFrom(Node.ChildByFieldName("name")) ?? throw new global::TreeSitter.Typed.IncorrectNodeKindException(Node, "TreeSitter.Grammars.Python.Identifier", "name");
+        public TreeSitter.Grammars.Python.Identifier Name => TreeSitter.Grammars.Python.Identifier.TryFrom(Node.ChildByFieldName("name")) ?? throw new global::TreeSitter.Typed.IncorrectNodeKindException(Node, "TreeSitter.Grammars.Python.Identifier");
 
         /// <summary>The required <c>type</c> field.</summary>
         /// <exception cref="global::TreeSitter.Typed.IncorrectNodeKindException">The field is absent or has an unexpected kind.</exception>
-        public TreeSitter.Grammars.Python.Type Type => TreeSitter.Grammars.Python.Type.TryFrom(Node.ChildByFieldName("type")) ?? throw new global::TreeSitter.Typed.IncorrectNodeKindException(Node, "TreeSitter.Grammars.Python.Type", "type");
+        public TreeSitter.Grammars.Python.Type Type => TreeSitter.Grammars.Python.Type.TryFrom(Node.ChildByFieldName("type")) ?? throw new global::TreeSitter.Typed.IncorrectNodeKindException(Node, "TreeSitter.Grammars.Python.Type");
 
         /// <summary>The required <c>value</c> field.</summary>
         /// <exception cref="global::TreeSitter.Typed.IncorrectNodeKindException">The field is absent or has an unexpected kind.</exception>
-        public TreeSitter.Grammars.Python.Expression Value => TreeSitter.Grammars.Python.Expression.TryFrom(Node.ChildByFieldName("value")) ?? throw new global::TreeSitter.Typed.IncorrectNodeKindException(Node, "TreeSitter.Grammars.Python.Expression", "value");
+        public TreeSitter.Grammars.Python.Expression Value => TreeSitter.Grammars.Python.Expression.TryFrom(Node.ChildByFieldName("value")) ?? throw new global::TreeSitter.Typed.IncorrectNodeKindException(Node, "TreeSitter.Grammars.Python.Expression");
 
     }
 
@@ -6461,7 +6461,7 @@ namespace TreeSitter.Grammars.Python
         }
         /// <summary>The required <c>type</c> field.</summary>
         /// <exception cref="global::TreeSitter.Typed.IncorrectNodeKindException">The field is absent or has an unexpected kind.</exception>
-        public TreeSitter.Grammars.Python.Type Type => TreeSitter.Grammars.Python.Type.TryFrom(Node.ChildByFieldName("type")) ?? throw new global::TreeSitter.Typed.IncorrectNodeKindException(Node, "TreeSitter.Grammars.Python.Type", "type");
+        public TreeSitter.Grammars.Python.Type Type => TreeSitter.Grammars.Python.Type.TryFrom(Node.ChildByFieldName("type")) ?? throw new global::TreeSitter.Typed.IncorrectNodeKindException(Node, "TreeSitter.Grammars.Python.Type");
 
         /// <summary>The single unnamed child.</summary>
         /// <exception cref="global::TreeSitter.Typed.IncorrectNodeKindException">The child is absent or has an unexpected kind.</exception>
@@ -6511,11 +6511,11 @@ namespace TreeSitter.Grammars.Python
         }
         /// <summary>The required <c>argument</c> field.</summary>
         /// <exception cref="global::TreeSitter.Typed.IncorrectNodeKindException">The field is absent or has an unexpected kind.</exception>
-        public TreeSitter.Grammars.Python.PrimaryExpression Argument => TreeSitter.Grammars.Python.PrimaryExpression.TryFrom(Node.ChildByFieldName("argument")) ?? throw new global::TreeSitter.Typed.IncorrectNodeKindException(Node, "TreeSitter.Grammars.Python.PrimaryExpression", "argument");
+        public TreeSitter.Grammars.Python.PrimaryExpression Argument => TreeSitter.Grammars.Python.PrimaryExpression.TryFrom(Node.ChildByFieldName("argument")) ?? throw new global::TreeSitter.Typed.IncorrectNodeKindException(Node, "TreeSitter.Grammars.Python.PrimaryExpression");
 
         /// <summary>The required <c>operator</c> field.</summary>
         /// <exception cref="global::TreeSitter.Typed.IncorrectNodeKindException">The field is absent or has an unexpected kind.</exception>
-        public TreeSitter.Grammars.Python.AnonUnions.Minus_Plus_Tilde Operator => TreeSitter.Grammars.Python.AnonUnions.Minus_Plus_Tilde.TryFrom(Node.ChildByFieldName("operator")) ?? throw new global::TreeSitter.Typed.IncorrectNodeKindException(Node, "TreeSitter.Grammars.Python.AnonUnions.Minus_Plus_Tilde", "operator");
+        public TreeSitter.Grammars.Python.AnonUnions.Minus_Plus_Tilde Operator => TreeSitter.Grammars.Python.AnonUnions.Minus_Plus_Tilde.TryFrom(Node.ChildByFieldName("operator")) ?? throw new global::TreeSitter.Typed.IncorrectNodeKindException(Node, "TreeSitter.Grammars.Python.AnonUnions.Minus_Plus_Tilde");
 
     }
 
@@ -6648,11 +6648,11 @@ namespace TreeSitter.Grammars.Python
 
         /// <summary>The required <c>body</c> field.</summary>
         /// <exception cref="global::TreeSitter.Typed.IncorrectNodeKindException">The field is absent or has an unexpected kind.</exception>
-        public TreeSitter.Grammars.Python.Block Body => TreeSitter.Grammars.Python.Block.TryFrom(Node.ChildByFieldName("body")) ?? throw new global::TreeSitter.Typed.IncorrectNodeKindException(Node, "TreeSitter.Grammars.Python.Block", "body");
+        public TreeSitter.Grammars.Python.Block Body => TreeSitter.Grammars.Python.Block.TryFrom(Node.ChildByFieldName("body")) ?? throw new global::TreeSitter.Typed.IncorrectNodeKindException(Node, "TreeSitter.Grammars.Python.Block");
 
         /// <summary>The required <c>condition</c> field.</summary>
         /// <exception cref="global::TreeSitter.Typed.IncorrectNodeKindException">The field is absent or has an unexpected kind.</exception>
-        public TreeSitter.Grammars.Python.Expression Condition => TreeSitter.Grammars.Python.Expression.TryFrom(Node.ChildByFieldName("condition")) ?? throw new global::TreeSitter.Typed.IncorrectNodeKindException(Node, "TreeSitter.Grammars.Python.Expression", "condition");
+        public TreeSitter.Grammars.Python.Expression Condition => TreeSitter.Grammars.Python.Expression.TryFrom(Node.ChildByFieldName("condition")) ?? throw new global::TreeSitter.Typed.IncorrectNodeKindException(Node, "TreeSitter.Grammars.Python.Expression");
 
     }
 
@@ -6770,7 +6770,7 @@ namespace TreeSitter.Grammars.Python
         }
         /// <summary>The required <c>value</c> field.</summary>
         /// <exception cref="global::TreeSitter.Typed.IncorrectNodeKindException">The field is absent or has an unexpected kind.</exception>
-        public TreeSitter.Grammars.Python.Expression Value => TreeSitter.Grammars.Python.Expression.TryFrom(Node.ChildByFieldName("value")) ?? throw new global::TreeSitter.Typed.IncorrectNodeKindException(Node, "TreeSitter.Grammars.Python.Expression", "value");
+        public TreeSitter.Grammars.Python.Expression Value => TreeSitter.Grammars.Python.Expression.TryFrom(Node.ChildByFieldName("value")) ?? throw new global::TreeSitter.Typed.IncorrectNodeKindException(Node, "TreeSitter.Grammars.Python.Expression");
 
     }
 
@@ -6808,7 +6808,7 @@ namespace TreeSitter.Grammars.Python
         }
         /// <summary>The required <c>body</c> field.</summary>
         /// <exception cref="global::TreeSitter.Typed.IncorrectNodeKindException">The field is absent or has an unexpected kind.</exception>
-        public TreeSitter.Grammars.Python.Block Body => TreeSitter.Grammars.Python.Block.TryFrom(Node.ChildByFieldName("body")) ?? throw new global::TreeSitter.Typed.IncorrectNodeKindException(Node, "TreeSitter.Grammars.Python.Block", "body");
+        public TreeSitter.Grammars.Python.Block Body => TreeSitter.Grammars.Python.Block.TryFrom(Node.ChildByFieldName("body")) ?? throw new global::TreeSitter.Typed.IncorrectNodeKindException(Node, "TreeSitter.Grammars.Python.Block");
 
         /// <summary>The single unnamed child.</summary>
         /// <exception cref="global::TreeSitter.Typed.IncorrectNodeKindException">The child is absent or has an unexpected kind.</exception>

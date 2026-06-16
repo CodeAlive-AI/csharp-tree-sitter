@@ -209,7 +209,10 @@ internal sealed class StructEmitter
         {
             EmitDocSummary($"The required <c>{Escape(fieldName)}</c> field.");
             _w.Line($"/// <exception cref=\"global::TreeSitter.Typed.IncorrectNodeKindException\">The field is absent or has an unexpected kind.</exception>");
-            _w.Line($"public {t} {member} => {t}.TryFrom(Node.ChildByFieldName({Literal(fieldName)})) ?? throw new global::TreeSitter.Typed.IncorrectNodeKindException(Node, {Literal(t)}, {Literal(fieldName)});");
+            // The exception's 3rd ctor arg is `acceptedKinds`, NOT the field name: passing
+            // the field name there is misleading. Omit it (consistent with the required-child
+            // accessor below); the field is named in the doc comment / call site.
+            _w.Line($"public {t} {member} => {t}.TryFrom(Node.ChildByFieldName({Literal(fieldName)})) ?? throw new global::TreeSitter.Typed.IncorrectNodeKindException(Node, {Literal(t)});");
         }
         else
         {

@@ -88,6 +88,36 @@ public class TypedNodeTests
     }
 
     [Fact]
+    public void UntypedNode_Is_is_consistent_with_As_for_runtime_property_wrappers()
+    {
+        // For ExtraNode/ErrorNode/MissingNode, Accepts(kind) is always false but TryFrom
+        // checks a runtime property. Is<T>() must agree with As<T>() (both via TryFrom),
+        // so Is<ExtraNode>() is TRUE for an extra (comment) node even though Accepts is false.
+        using var parser = new Parser(Grammars.Json);
+        using Tree? tree = parser.Parse("[1] // trailing comment\n");
+        Assert.NotNull(tree);
+
+        Node? comment = FindFirst(tree!.RootNode, n => n.Kind == "comment");
+        Assert.NotNull(comment);
+        Assert.True(comment!.Value.IsExtra);
+
+        var onExtra = new UntypedNode(comment.Value);
+        Assert.True(onExtra.Is<ExtraNode>());
+        Assert.Equal(onExtra.As<ExtraNode>() is not null, onExtra.Is<ExtraNode>());
+        Assert.False(ExtraNode.Accepts(comment.Value.Kind)); // kind-based check would say false
+
+        // A non-extra node: Is<ExtraNode>() is false, still consistent with As<ExtraNode>().
+        var onRoot = new UntypedNode(tree.RootNode);
+        Assert.False(onRoot.Is<ExtraNode>());
+        Assert.Equal(onRoot.As<ExtraNode>() is not null, onRoot.Is<ExtraNode>());
+
+        // Kind-based wrappers remain consistent too.
+        var onArray = new UntypedNode(tree.RootNode.NamedChild(0));
+        Assert.True(onArray.Is<Json.Array>());
+        Assert.Equal(onArray.As<Json.Array>() is not null, onArray.Is<Json.Array>());
+    }
+
+    [Fact]
     public void UntypedNode_Cast_mismatch_throws()
     {
         using Tree tree = Parse("{}");
@@ -157,10 +187,13 @@ public class TypedNodeTests
 
         // Reading a required typed field whose underlying child is forced to a wrong
         // type via the equivalent generated idiom throws IncorrectNodeKindException.
+        // The generated required-field accessor passes only (Node, expectedType) — the
+        // field name is NOT shoved into the acceptedKinds slot — so AcceptedKinds is null.
         IncorrectNodeKindException ex = Assert.Throws<IncorrectNodeKindException>(() =>
             Json.Object.TryFrom(pairNode.ChildByFieldName("key"))
-                ?? throw new IncorrectNodeKindException(pairNode, "TreeSitter.Grammars.Json.Object", "key"));
-        Assert.Equal("key", ex.AcceptedKinds);
+                ?? throw new IncorrectNodeKindException(pairNode, "TreeSitter.Grammars.Json.Object"));
+        Assert.Equal("TreeSitter.Grammars.Json.Object", ex.ExpectedType);
+        Assert.Null(ex.AcceptedKinds);
     }
 
     [Fact]

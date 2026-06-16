@@ -32,7 +32,14 @@ public readonly struct UntypedNode : ITypedNode<UntypedNode>
 
     /// <summary>Determines whether the wrapped node can be represented as <typeparamref name="T"/>.</summary>
     /// <typeparam name="T">A typed node wrapper.</typeparam>
-    public bool Is<T>() where T : struct, ITypedNode<T> => !Node.IsNull && T.Accepts(Node.Kind);
+    /// <remarks>
+    /// Uses <see cref="ITypedNode{TSelf}.TryFrom(TreeSitter.Node)"/> so the result is
+    /// consistent with <see cref="As{T}"/>/<see cref="Cast{T}"/>: for runtime-property
+    /// wrappers such as <see cref="ExtraNode"/>/<see cref="ErrorNode"/>/<see cref="MissingNode"/>
+    /// (whose <c>Accepts</c> is always <see langword="false"/>) this still reports
+    /// <see langword="true"/> exactly when the conversion would succeed.
+    /// </remarks>
+    public bool Is<T>() where T : struct, ITypedNode<T> => T.TryFrom(Node) is not null;
 
     /// <summary>
     /// Attempts to convert the wrapped node to <typeparamref name="T"/>, returning

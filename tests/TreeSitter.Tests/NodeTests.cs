@@ -331,6 +331,36 @@ public class NodeTests
     }
 
     [Fact]
+    public void Tree_attached_null_node_equals_and_hashes_like_default()
+    {
+        using Tree tree = Tree("[1]");
+
+        // A tree-ATTACHED null node: the parent of the root carries the owning tree
+        // reference but has a zero underlying node id, so it is IsNull yet not default.
+        Node attachedNull = tree.RootNode.Parent;
+        Assert.True(attachedNull.IsNull);
+
+        // Another flavour of tree-attached null: an absent field child.
+        Node absentField = tree.RootNode.ChildByFieldName("no_such_field");
+        Assert.True(absentField.IsNull);
+
+        Node def = default;
+
+        // Equals already treats all null nodes as equal; GetHashCode must agree (contract).
+        Assert.True(attachedNull.Equals(def));
+        Assert.True(def.Equals(attachedNull));
+        Assert.Equal(def.GetHashCode(), attachedNull.GetHashCode());
+        Assert.Equal(def.GetHashCode(), absentField.GetHashCode());
+        Assert.Equal(0, def.GetHashCode());
+
+        // ...so they collapse to a single entry when used as HashSet<Node> keys.
+        var set = new HashSet<Node> { def, attachedNull, absentField };
+        Assert.Single(set);
+        Assert.Contains(def, set);
+        Assert.Contains(attachedNull, set);
+    }
+
+    [Fact]
     public void TextSpan_empty_when_range_out_of_bounds()
     {
         // RootNodeWithOffset pushes byte offsets beyond the retained source, so

@@ -483,11 +483,11 @@ namespace TreeSitter.Grammars.Json
         }
         /// <summary>The required <c>key</c> field.</summary>
         /// <exception cref="global::TreeSitter.Typed.IncorrectNodeKindException">The field is absent or has an unexpected kind.</exception>
-        public TreeSitter.Grammars.Json.String Key => TreeSitter.Grammars.Json.String.TryFrom(Node.ChildByFieldName("key")) ?? throw new global::TreeSitter.Typed.IncorrectNodeKindException(Node, "TreeSitter.Grammars.Json.String", "key");
+        public TreeSitter.Grammars.Json.String Key => TreeSitter.Grammars.Json.String.TryFrom(Node.ChildByFieldName("key")) ?? throw new global::TreeSitter.Typed.IncorrectNodeKindException(Node, "TreeSitter.Grammars.Json.String");
 
         /// <summary>The required <c>value</c> field.</summary>
         /// <exception cref="global::TreeSitter.Typed.IncorrectNodeKindException">The field is absent or has an unexpected kind.</exception>
-        public TreeSitter.Grammars.Json.Value Value => TreeSitter.Grammars.Json.Value.TryFrom(Node.ChildByFieldName("value")) ?? throw new global::TreeSitter.Typed.IncorrectNodeKindException(Node, "TreeSitter.Grammars.Json.Value", "value");
+        public TreeSitter.Grammars.Json.Value Value => TreeSitter.Grammars.Json.Value.TryFrom(Node.ChildByFieldName("value")) ?? throw new global::TreeSitter.Typed.IncorrectNodeKindException(Node, "TreeSitter.Grammars.Json.Value");
 
     }
 

@@ -187,8 +187,12 @@ public static class LanguagePack
         nint handle;
         try
         {
+            // Load via a PUBLIC TreeSitter type so the NativeLibraryResolver — which is
+            // registered on the TreeSitter assembly only — fires for this grammar load.
+            // This makes TREE_SITTER_NATIVE_PATH and the repo native/<rid>/ dev fallback
+            // apply to grammars too (see docs/ARCHITECTURE.md and LanguageNotAvailableException).
             handle = System.Runtime.InteropServices.NativeLibrary.Load(
-                info.NativeLibraryName, typeof(LanguagePack).Assembly, null);
+                info.NativeLibraryName, typeof(global::TreeSitter.Language).Assembly, null);
         }
         catch (Exception ex) when (ex is DllNotFoundException or System.IO.FileNotFoundException or BadImageFormatException)
         {
