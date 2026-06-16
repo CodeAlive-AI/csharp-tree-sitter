@@ -36,6 +36,11 @@
        public API is unchanged. -->
   <ItemGroup>
     <InternalsVisibleTo Include="TreeSitter.Tests" />
+    <!-- LanguagePack resolves grammar libraries through this assembly's
+         NativeLibraryResolver (so TREE_SITTER_NATIVE_PATH and the repo native/<rid>/
+         dev fallback apply to grammar loads). NativeLibrary.Load does NOT invoke the
+         DllImport resolver, so the pack must call the resolver's probe directly. -->
+    <InternalsVisibleTo Include="TreeSitter.LanguagePack" />
   </ItemGroup>
 
   <!-- NuGet package metadata. -->

@@ -99,6 +99,33 @@ internal static class NativeLibraryResolver
         return handle;
     }
 
+    /// <summary>
+    /// Runs the binding's native-library probing sequence for <paramref name="logicalName"/>
+    /// (the same well-known locations the <see cref="DllImportResolver"/> uses: the
+    /// <c>TREE_SITTER_NATIVE_PATH</c> override, the NuGet <c>runtimes/&lt;rid&gt;/native</c>
+    /// layout, the assembly directory, and the repo <c>native/&lt;rid&gt;/</c> dev
+    /// fallback), returning the loaded handle on success.
+    /// </summary>
+    /// <remarks>
+    /// This is the explicit entry point grammar loaders (notably
+    /// <c>TreeSitter.LanguagePack</c>) must call, because
+    /// <see cref="NativeLibrary.Load(string, Assembly, DllImportSearchPath?)"/> does
+    /// <b>not</b> invoke a resolver registered via
+    /// <see cref="NativeLibrary.SetDllImportResolver"/> — that callback is wired only
+    /// into the <c>DllImport</c>/<c>LibraryImport</c> path. Routing grammar loads
+    /// through here keeps <c>TREE_SITTER_NATIVE_PATH</c> and the dev fallback working
+    /// for grammars exactly as they do for the core engine. Successful resolutions are
+    /// cached by logical name, mirroring <see cref="Resolve"/>.
+    /// </remarks>
+    /// <param name="logicalName">The logical library name (e.g. <c>tree-sitter-python</c>).</param>
+    /// <param name="handle">On success, the loaded native handle; otherwise <see cref="IntPtr.Zero"/>.</param>
+    /// <returns><see langword="true"/> if the library was resolved and loaded.</returns>
+    internal static bool TryResolve(string logicalName, out IntPtr handle)
+    {
+        handle = Resolve(logicalName, typeof(NativeLibraryResolver).Assembly, searchPath: null);
+        return handle != IntPtr.Zero;
+    }
+
     /// <summary>Runs the full probing sequence for an unresolved logical name.</summary>
     private static IntPtr ResolveCore(string libraryName, Assembly assembly)
     {

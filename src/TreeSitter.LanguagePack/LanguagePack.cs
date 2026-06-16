@@ -187,12 +187,21 @@ public static class LanguagePack
         nint handle;
         try
         {
-            // Load via a PUBLIC TreeSitter type so the NativeLibraryResolver — which is
-            // registered on the TreeSitter assembly only — fires for this grammar load.
-            // This makes TREE_SITTER_NATIVE_PATH and the repo native/<rid>/ dev fallback
-            // apply to grammars too (see docs/ARCHITECTURE.md and LanguageNotAvailableException).
-            handle = System.Runtime.InteropServices.NativeLibrary.Load(
-                info.NativeLibraryName, typeof(global::TreeSitter.Language).Assembly, null);
+            // Resolve through the TreeSitter NativeLibraryResolver's probe sequence so
+            // TREE_SITTER_NATIVE_PATH, the runtimes/<rid>/native layout, the assembly
+            // directory, and the repo native/<rid>/ dev fallback ALL apply to grammar
+            // loads (see docs/ARCHITECTURE.md and LanguageNotAvailableException).
+            //
+            // We must call the resolver explicitly: NativeLibrary.Load(name, assembly,
+            // searchPath) does NOT invoke the DllImport resolver registered via
+            // SetDllImportResolver — that callback only fires for DllImport/LibraryImport
+            // P/Invoke. So delegate to the resolver's probe first, then fall back to the
+            // default loader (which honours the OS search path and any embedded rpath).
+            if (!global::TreeSitter.Native.NativeLibraryResolver.TryResolve(info.NativeLibraryName, out handle))
+            {
+                handle = System.Runtime.InteropServices.NativeLibrary.Load(
+                    info.NativeLibraryName, typeof(global::TreeSitter.Language).Assembly, null);
+            }
         }
         catch (Exception ex) when (ex is DllNotFoundException or System.IO.FileNotFoundException or BadImageFormatException)
         {

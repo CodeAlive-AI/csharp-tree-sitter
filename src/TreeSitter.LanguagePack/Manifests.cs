@@ -53,13 +53,48 @@ internal static class Manifests
     private static Dictionary<string, ManifestEntry> DeserializeRaw()
     {
         using Stream stream = OpenManifest();
-        Dictionary<string, ManifestEntry>? raw =
-            JsonSerializer.Deserialize(stream, ManifestJsonContext.Default.DictionaryStringManifestEntry);
+        return DeserializeRaw(stream);
+    }
+
+    /// <summary>
+    /// Parses manifest JSON from an arbitrary <paramref name="stream"/> into its raw
+    /// entries, throwing <see cref="InvalidOperationException"/> with a clear message
+    /// when the document is empty, <c>null</c>, or contains no entries. This is the
+    /// single validation seam shared by the embedded-resource read and the tests; it
+    /// keeps the public <see cref="LoadAll"/> behavior identical while letting the
+    /// empty/corrupt-manifest path be exercised with synthetic input.
+    /// </summary>
+    /// <param name="stream">A UTF-8 JSON stream holding a <c>name -&gt; entry</c> object.</param>
+    internal static Dictionary<string, ManifestEntry> DeserializeRaw(Stream stream)
+    {
+        Dictionary<string, ManifestEntry>? raw;
+        try
+        {
+            raw = JsonSerializer.Deserialize(stream, ManifestJsonContext.Default.DictionaryStringManifestEntry);
+        }
+        catch (JsonException ex)
+        {
+            // A malformed manifest must surface as a clear, typed error with the parse
+            // failure chained — never a bare JsonException leaking out of the loader.
+            throw new InvalidOperationException(
+                "The embedded language manifest is empty or could not be parsed.", ex);
+        }
 
         if (raw is null || raw.Count == 0)
             throw new InvalidOperationException("The embedded language manifest is empty or could not be parsed.");
 
         return raw;
+    }
+
+    /// <summary>
+    /// Parses manifest JSON from a <paramref name="json"/> string. A convenience wrapper
+    /// over <see cref="DeserializeRaw(Stream)"/> for tests; shares the same validation.
+    /// </summary>
+    /// <param name="json">The manifest JSON text.</param>
+    internal static Dictionary<string, ManifestEntry> DeserializeRaw(string json)
+    {
+        using var stream = new MemoryStream(System.Text.Encoding.UTF8.GetBytes(json));
+        return DeserializeRaw(stream);
     }
 
     /// <summary>
