@@ -78,7 +78,7 @@ internal static class NativeLibraryResolver
     /// resolved library, or <see cref="IntPtr.Zero"/> to fall back to the default
     /// runtime resolution.
     /// </summary>
-    private static IntPtr Resolve(string libraryName, Assembly assembly, DllImportSearchPath? searchPath)
+    internal static IntPtr Resolve(string libraryName, Assembly assembly, DllImportSearchPath? searchPath)
     {
         // Only handle the logical names this binding uses. Everything else falls
         // through to the runtime's default resolution.
@@ -148,7 +148,7 @@ internal static class NativeLibraryResolver
     }
 
     /// <summary>True if the logical name is one this binding is responsible for.</summary>
-    private static bool IsTreeSitterLibrary(string libraryName) =>
+    internal static bool IsTreeSitterLibrary(string libraryName) =>
         libraryName == CoreLibraryName ||
         libraryName.StartsWith("tree-sitter-", StringComparison.Ordinal);
 

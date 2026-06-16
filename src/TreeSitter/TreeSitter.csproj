@@ -28,6 +28,13 @@
     <RuntimeIdentifiers>linux-x64;osx-arm64;osx-x64;win-x64</RuntimeIdentifiers>
   </PropertyGroup>
 
+  <!-- Expose internal helpers (native-resolver OS mapping, internal probe entry
+       points) to the test assembly so they can be unit-tested on any host. The
+       public API is unchanged. -->
+  <ItemGroup>
+    <InternalsVisibleTo Include="TreeSitter.Tests" />
+  </ItemGroup>
+
   <!-- NuGet package metadata. -->
   <PropertyGroup>
     <PackageId>TreeSitter</PackageId>
