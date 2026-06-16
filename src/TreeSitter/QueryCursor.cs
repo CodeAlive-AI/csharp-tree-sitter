@@ -41,11 +41,42 @@ public sealed class QueryCursor : IDisposable
     /// </summary>
     /// <param name="query">The query to run.</param>
     /// <param name="node">The node to run it against.</param>
-    public void Exec(Query query, Node node)
+    public unsafe void Exec(Query query, Node node)
     {
         ArgumentNullException.ThrowIfNull(query);
         _tree = node.OwningTree;
-        NativeMethods.ts_query_cursor_exec(Handle, query.Handle, node.Raw);
+
+        if (_timeoutMicros == 0)
+        {
+            NativeMethods.ts_query_cursor_exec(Handle, query.Handle, node.Raw);
+            return;
+        }
+
+        // Enforce the configured timeout via the progress callback, which fires
+        // during subsequent NextMatch/NextCapture calls. The deadline therefore must
+        // outlive Exec(); it is stored in a native cell owned by this cursor (freed
+        // on the next timed exec and on Dispose) so the payload pointer stays valid.
+        if (_deadlineCell is null)
+            _deadlineCell = (long*)System.Runtime.InteropServices.NativeMemory.Alloc((nuint)sizeof(long));
+        *_deadlineCell = System.Diagnostics.Stopwatch.GetTimestamp() +
+            (long)((double)_timeoutMicros / 1_000_000.0 * System.Diagnostics.Stopwatch.Frequency);
+
+        var options = new TSQueryCursorOptions
+        {
+            Payload = (IntPtr)_deadlineCell,
+            ProgressCallback = &QueryProgressThunk,
+        };
+        NativeMethods.ts_query_cursor_exec_with_options(Handle, query.Handle, node.Raw, &options);
+    }
+
+    private unsafe long* _deadlineCell;
+
+    [System.Runtime.InteropServices.UnmanagedCallersOnly(
+        CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
+    private static unsafe byte QueryProgressThunk(TSQueryCursorState* state)
+    {
+        long* deadline = (long*)state->Payload;
+        return System.Diagnostics.Stopwatch.GetTimestamp() >= *deadline ? (byte)1 : (byte)0;
     }
 
     /// <summary>
@@ -163,12 +194,10 @@ public sealed class QueryCursor : IDisposable
     /// </summary>
     /// <param name="timeoutMicros">The timeout in microseconds; <c>0</c> disables it.</param>
     /// <remarks>
-    /// ABI 15 exposes no direct timeout setter on a query cursor; this enforces the
-    /// limit by installing a progress callback for the next <see cref="Exec"/> via
-    /// <c>ts_query_cursor_exec_with_options</c>. Because the binding's
-    /// <see cref="Exec"/> uses the option-free entry point, callers that need a hard
-    /// query timeout should re-run after setting it. This setter records the value
-    /// and applies it through a wrapping execution when non-zero.
+    /// ABI 15 exposes no direct timeout setter on a query cursor, so when this is set
+    /// to a non-zero value the next <see cref="Exec"/> routes through
+    /// <c>ts_query_cursor_exec_with_options</c> with a progress callback that cancels
+    /// execution once the deadline elapses.
     /// </remarks>
     public void SetTimeoutMicros(ulong timeoutMicros) => _timeoutMicros = timeoutMicros;
 
@@ -199,10 +228,15 @@ public sealed class QueryCursor : IDisposable
         GC.SuppressFinalize(this);
     }
 
-    private void DisposeCore()
+    private unsafe void DisposeCore()
     {
         IntPtr handle = Interlocked.Exchange(ref _handle, IntPtr.Zero);
         if (handle != IntPtr.Zero)
             NativeMethods.ts_query_cursor_delete(handle);
+        if (_deadlineCell is not null)
+        {
+            System.Runtime.InteropServices.NativeMemory.Free(_deadlineCell);
+            _deadlineCell = null;
+        }
     }
 }
