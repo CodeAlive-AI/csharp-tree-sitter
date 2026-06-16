@@ -1,0 +1,57 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <RootNamespace>TreeSitter</RootNamespace>
+    <AssemblyName>TreeSitter</AssemblyName>
+
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <LangVersion>latest</LangVersion>
+
+    <!-- Reproducible builds. -->
+    <Deterministic>true</Deterministic>
+
+    <!-- Public API documentation. -->
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+
+    <!-- We keep warnings visible but do NOT fail the build on them. -->
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+  </PropertyGroup>
+
+  <!-- NuGet package metadata. -->
+  <PropertyGroup>
+    <PackageId>TreeSitter</PackageId>
+    <Authors>CodeAlive-AI</Authors>
+    <Description>Production-ready, cross-platform, strongly-typed C# bindings for tree-sitter (ABI 15 / v0.26.9). Layer 0 (native interop) and Layer 1 (safe object-oriented API).</Description>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/CodeAlive-AI/csharp-tree-sitter</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/CodeAlive-AI/csharp-tree-sitter</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageTags>tree-sitter;parser;parsing;syntax-tree;ast;incremental</PackageTags>
+  </PropertyGroup>
+
+  <!--
+    Local-development native loading.
+
+    Copy the pre-built native shared libraries from the repository's
+    native/<rid>/ folders next to the built assembly so that the
+    NativeLibrary resolver's app-base / Load(fileName) fallback can find
+    libtree-sitter.so (and grammar libraries) during local runs and tests.
+
+    The link path is flattened (no rid sub-folder) so the libraries land
+    directly beside TreeSitter.dll. The packaged NuGet does NOT carry these
+    (they are excluded from Pack); a consuming app supplies its own RID-specific
+    runtimes/<rid>/native payload or sets $TREE_SITTER_NATIVE_PATH.
+  -->
+  <ItemGroup>
+    <None Include="..\..\native\**\*.so;..\..\native\**\*.dll;..\..\native\**\*.dylib"
+          Condition="Exists('..\..\native')"
+          CopyToOutputDirectory="PreserveNewest"
+          Link="%(Filename)%(Extension)"
+          Pack="false"
+          Visible="false" />
+  </ItemGroup>
+
+</Project>
