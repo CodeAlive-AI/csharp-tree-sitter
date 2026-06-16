@@ -1,4 +1,5 @@
 using System.Runtime.InteropServices;
+using TreeSitter; // TreeSitterException
 
 namespace TreeSitter.Native;
 

@@ -18,6 +18,14 @@
 
     <!-- We keep warnings visible but do NOT fail the build on them. -->
     <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+
+    <!--
+      Portable RIDs this binding ships native assets for. This communicates the
+      supported platforms to NuGet restore; it does NOT force multi-RID output in a
+      single build (the consuming app picks one at publish time via RuntimeIdentifier).
+      osx-x64 is listed for legacy Intel Macs even though we do not bundle it here yet.
+    -->
+    <RuntimeIdentifiers>linux-x64;osx-arm64;osx-x64;win-x64</RuntimeIdentifiers>
   </PropertyGroup>
 
   <!-- NuGet package metadata. -->
@@ -33,21 +41,65 @@
   </PropertyGroup>
 
   <!--
-    Local-development native loading.
+    ===========================================================================
+    PACK: bundle the pre-built native libraries into the NuGet package under the
+    standard runtimes/<rid>/native/ layout. The .NET host auto-discovers these by
+    RID for published apps; no consumer wiring is required.
 
-    Copy the pre-built native shared libraries from the repository's
-    native/<rid>/ folders next to the built assembly so that the
-    NativeLibrary resolver's app-base / Load(fileName) fallback can find
-    libtree-sitter.so (and grammar libraries) during local runs and tests.
+    Each item is Condition-guarded on the source file/glob existing so that packing
+    on a host that has only built SOME RIDs (e.g. only linux-x64 here) still
+    succeeds — the absent RID directories simply contribute nothing. Using <None>
+    (not <Content>) keeps these out of THIS library's own build output; the local
+    dev-copy items below handle that case separately.
 
-    The link path is flattened (no rid sub-folder) so the libraries land
-    directly beside TreeSitter.dll. The packaged NuGet does NOT carry these
-    (they are excluded from Pack); a consuming app supplies its own RID-specific
-    runtimes/<rid>/native payload or sets $TREE_SITTER_NATIVE_PATH.
+    $(RepoRoot) is defined in the repo-root Directory.Build.props and ends with a
+    directory separator, so "$(RepoRoot)native/..." composes correctly.
+    ===========================================================================
   -->
   <ItemGroup>
-    <None Include="..\..\native\**\*.so;..\..\native\**\*.dll;..\..\native\**\*.dylib"
-          Condition="Exists('..\..\native')"
+    <!-- linux-x64: core runtime + any bundled grammar libs. -->
+    <None Include="$(RepoRoot)native/linux-x64/libtree-sitter.so"
+          Condition="Exists('$(RepoRoot)native/linux-x64/libtree-sitter.so')"
+          Pack="true"
+          PackagePath="runtimes/linux-x64/native/%(Filename)%(Extension)"
+          Visible="false" />
+    <None Include="$(RepoRoot)native/linux-x64/libtree-sitter-*.so"
+          Condition="Exists('$(RepoRoot)native/linux-x64')"
+          Pack="true"
+          PackagePath="runtimes/linux-x64/native/"
+          Visible="false" />
+
+    <!-- osx-arm64 (Apple Silicon): core runtime + any bundled grammar libs. -->
+    <None Include="$(RepoRoot)native/osx-arm64/libtree-sitter.dylib"
+          Condition="Exists('$(RepoRoot)native/osx-arm64/libtree-sitter.dylib')"
+          Pack="true"
+          PackagePath="runtimes/osx-arm64/native/%(Filename)%(Extension)"
+          Visible="false" />
+    <None Include="$(RepoRoot)native/osx-arm64/libtree-sitter-*.dylib"
+          Condition="Exists('$(RepoRoot)native/osx-arm64')"
+          Pack="true"
+          PackagePath="runtimes/osx-arm64/native/"
+          Visible="false" />
+  </ItemGroup>
+
+  <!--
+    ===========================================================================
+    LOCAL DEV / TEST: copy the current host's native libraries next to the built
+    assembly so the NativeLibraryResolver's AssemblyDirectory probe finds
+    libtree-sitter.so (and grammar libs) during `dotnet run` / `dotnet test`.
+
+    These are explicitly Pack="false" (they must not enter the NuGet — the packed
+    runtimes/<rid>/native/ items above carry the shipping payload). The link path is
+    flattened so the files land directly beside TreeSitter.dll.
+
+    $(NETCoreSdkPortableRuntimeIdentifier) is the PORTABLE host RID set by the SDK
+    targets (linux-x64 here, not the distro-specific "ubuntu.24.04-x64"), so this
+    picks native/linux-x64 on this box. It is fully resolved by item-evaluation time.
+    ===========================================================================
+  -->
+  <ItemGroup>
+    <None Include="$(RepoRoot)native/$(NETCoreSdkPortableRuntimeIdentifier)/*.so;$(RepoRoot)native/$(NETCoreSdkPortableRuntimeIdentifier)/*.dylib;$(RepoRoot)native/$(NETCoreSdkPortableRuntimeIdentifier)/*.dll"
+          Condition="Exists('$(RepoRoot)native/$(NETCoreSdkPortableRuntimeIdentifier)')"
           CopyToOutputDirectory="PreserveNewest"
           Link="%(Filename)%(Extension)"
           Pack="false"

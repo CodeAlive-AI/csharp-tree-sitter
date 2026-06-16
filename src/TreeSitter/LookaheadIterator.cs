@@ -11,10 +11,10 @@ namespace TreeSitter;
 /// </summary>
 public sealed class LookaheadIterator : IDisposable
 {
-    private IntPtr _handle;
+    private readonly LookaheadIteratorHandle _handle;
     private Language _language;
 
-    private LookaheadIterator(IntPtr handle, Language language)
+    private LookaheadIterator(LookaheadIteratorHandle handle, Language language)
     {
         _handle = handle;
         _language = language;
@@ -30,9 +30,12 @@ public sealed class LookaheadIterator : IDisposable
     public LookaheadIterator(Language language, ushort state)
     {
         ArgumentNullException.ThrowIfNull(language);
-        IntPtr handle = NativeMethods.ts_lookahead_iterator_new(language.Handle, state);
-        if (handle == IntPtr.Zero)
+        LookaheadIteratorHandle handle = NativeMethods.ts_lookahead_iterator_new(language.Handle, state);
+        if (handle.IsInvalid)
+        {
+            handle.Dispose();
             throw new ArgumentException($"State {state} is invalid for the given language.", nameof(state));
+        }
         _handle = handle;
         _language = language;
     }
@@ -43,18 +46,20 @@ public sealed class LookaheadIterator : IDisposable
     /// </summary>
     internal static LookaheadIterator? TryCreate(Language language, ushort state)
     {
-        IntPtr handle = NativeMethods.ts_lookahead_iterator_new(language.Handle, state);
-        return handle == IntPtr.Zero ? null : new LookaheadIterator(handle, language);
+        LookaheadIteratorHandle handle = NativeMethods.ts_lookahead_iterator_new(language.Handle, state);
+        if (handle.IsInvalid)
+        {
+            handle.Dispose();
+            return null;
+        }
+        return new LookaheadIterator(handle, language);
     }
 
-    /// <summary>Frees the native iterator if it was not explicitly disposed.</summary>
-    ~LookaheadIterator() => DisposeCore();
-
-    private IntPtr Handle
+    private LookaheadIteratorHandle Handle
     {
         get
         {
-            ObjectDisposedException.ThrowIf(_handle == IntPtr.Zero, this);
+            ObjectDisposedException.ThrowIf(_handle.IsClosed || _handle.IsInvalid, this);
             return _handle;
         }
     }
@@ -101,17 +106,10 @@ public sealed class LookaheadIterator : IDisposable
             yield return CurrentSymbol;
     }
 
-    /// <inheritdoc/>
-    public void Dispose()
-    {
-        DisposeCore();
-        GC.SuppressFinalize(this);
-    }
-
-    private void DisposeCore()
-    {
-        IntPtr handle = Interlocked.Exchange(ref _handle, IntPtr.Zero);
-        if (handle != IntPtr.Zero)
-            NativeMethods.ts_lookahead_iterator_delete(handle);
-    }
+    /// <summary>
+    /// Disposes the underlying native iterator. Idempotent: the
+    /// <see cref="LookaheadIteratorHandle"/> owns the critical finalizer and guards
+    /// against double-free.
+    /// </summary>
+    public void Dispose() => _handle.Dispose();
 }

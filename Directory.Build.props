@@ -1,0 +1,24 @@
+<Project>
+
+  <!--
+    Repository-wide MSBuild properties.
+
+    This file sits at the repository root, so MSBuild imports it for every project
+    underneath. It centralizes two things the TreeSitter project (and any future
+    projects/tests) need to locate the pre-built native libraries:
+
+      * $(RepoRoot)  — absolute path to the repository root, with a trailing slash,
+                       so paths can be composed as "$(RepoRoot)native/...".
+    The PORTABLE host RID itself ($(NETCoreSdkPortableRuntimeIdentifier), e.g.
+    linux-x64 / osx-arm64 / osx-x64 / win-x64) is provided by the .NET SDK targets,
+    which import AFTER this file — so projects reference that property directly where
+    they need it (it is fully resolved by the time item globs are evaluated). We
+    deliberately avoid NETCoreSdkRuntimeIdentifier, which can be a distro- and
+    version-specific RID (e.g. "ubuntu.24.04-x64") that does NOT match our
+    native/<rid>/ folder names.
+  -->
+  <PropertyGroup>
+    <RepoRoot>$(MSBuildThisFileDirectory)</RepoRoot>
+  </PropertyGroup>
+
+</Project>

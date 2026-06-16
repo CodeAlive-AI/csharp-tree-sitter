@@ -9,29 +9,33 @@ namespace TreeSitter;
 /// </summary>
 /// <remarks>
 /// Trees are not thread-safe; use <see cref="Copy"/> to obtain an independent tree
-/// for use on another thread.
+/// for use on another thread. The native <c>TSTree*</c> is held in a
+/// <see cref="TreeHandle"/> (a <see cref="System.Runtime.InteropServices.SafeHandle"/>),
+/// so disposal is idempotent and the handle cannot be freed while a P/Invoke using
+/// it is in flight.
 /// </remarks>
 public sealed class Tree : IDisposable
 {
-    private IntPtr _handle;
+    private readonly TreeHandle _handle;
     private readonly ReadOnlyMemory<byte> _source;
     private readonly Language _language;
 
-    internal Tree(IntPtr handle, ReadOnlyMemory<byte> source, Language language)
+    internal Tree(TreeHandle handle, ReadOnlyMemory<byte> source, Language language)
     {
         _handle = handle;
         _source = source;
         _language = language;
     }
 
-    /// <summary>Frees the native tree if it was not explicitly disposed.</summary>
-    ~Tree() => DisposeCore();
-
-    internal IntPtr Handle
+    /// <summary>
+    /// The owning <see cref="TreeHandle"/>, validated against disposal. Passed to
+    /// P/Invoke as a borrowed reference; the marshaller ref-counts it across calls.
+    /// </summary>
+    internal TreeHandle Handle
     {
         get
         {
-            ObjectDisposedException.ThrowIf(_handle == IntPtr.Zero, this);
+            ObjectDisposedException.ThrowIf(_handle.IsClosed || _handle.IsInvalid, this);
             return _handle;
         }
     }
@@ -60,7 +64,7 @@ public sealed class Tree : IDisposable
     /// </summary>
     public Tree Copy()
     {
-        IntPtr copy = NativeMethods.ts_tree_copy(Handle);
+        TreeHandle copy = NativeMethods.ts_tree_copy(Handle);
         return new Tree(copy, _source, _language);
     }
 
@@ -128,17 +132,9 @@ public sealed class Tree : IDisposable
         }
     }
 
-    /// <inheritdoc/>
-    public void Dispose()
-    {
-        DisposeCore();
-        GC.SuppressFinalize(this);
-    }
-
-    private void DisposeCore()
-    {
-        IntPtr handle = Interlocked.Exchange(ref _handle, IntPtr.Zero);
-        if (handle != IntPtr.Zero)
-            NativeMethods.ts_tree_delete(handle);
-    }
+    /// <summary>
+    /// Disposes the underlying native tree. Idempotent: the <see cref="TreeHandle"/>
+    /// owns the critical finalizer and guards against double-free.
+    /// </summary>
+    public void Dispose() => _handle.Dispose();
 }

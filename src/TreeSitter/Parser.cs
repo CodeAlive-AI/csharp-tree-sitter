@@ -12,7 +12,7 @@ namespace TreeSitter;
 /// </summary>
 public sealed class Parser : IDisposable
 {
-    private IntPtr _handle;
+    private readonly ParserHandle _handle;
     private Language? _language;
 
     // Logger state. The managed delegate is rooted in this field, and a GCHandle to
@@ -28,9 +28,7 @@ public sealed class Parser : IDisposable
     /// <summary>Creates a parser with no language assigned.</summary>
     public Parser()
     {
-        _handle = NativeMethods.ts_parser_new();
-        if (_handle == IntPtr.Zero)
-            throw new TreeSitterException("Failed to allocate a tree-sitter parser.");
+        _handle = ParserHandle.Create();
     }
 
     /// <summary>Creates a parser and assigns <paramref name="language"/>.</summary>
@@ -41,14 +39,11 @@ public sealed class Parser : IDisposable
         Language = language;
     }
 
-    /// <summary>Frees the native parser if it was not explicitly disposed.</summary>
-    ~Parser() => DisposeCore();
-
-    private IntPtr Handle
+    private ParserHandle Handle
     {
         get
         {
-            ObjectDisposedException.ThrowIf(_handle == IntPtr.Zero, this);
+            ObjectDisposedException.ThrowIf(_handle.IsClosed || _handle.IsInvalid, this);
             return _handle;
         }
     }
@@ -213,31 +208,49 @@ public sealed class Parser : IDisposable
 
     private unsafe Tree? ParseBytes(byte[] utf8, Tree? oldTree)
     {
-        IntPtr oldHandle = oldTree?.Handle ?? IntPtr.Zero;
-        IntPtr resultHandle;
-
-        fixed (byte* p = utf8)
+        // old_tree is a BORROWED pointer. When present, pin its SafeHandle open with
+        // DangerousAddRef so the raw pointer cannot be freed by another thread while
+        // the native parse reads it, releasing the ref once the call returns.
+        TreeHandle? oldHandleSafe = oldTree?.Handle;
+        bool oldRefAdded = false;
+        if (oldHandleSafe is not null)
+            oldHandleSafe.DangerousAddRef(ref oldRefAdded);
+        try
         {
-            // An empty buffer needs a valid (non-null) pointer; tree-sitter reads
-            // `length` bytes regardless. Use a scratch pointer for the zero case.
-            byte scratch = 0;
-            byte* src = utf8.Length == 0 ? &scratch : p;
+            IntPtr oldHandle = oldRefAdded ? oldHandleSafe!.DangerousGetHandle() : IntPtr.Zero;
+            TreeHandle resultHandle;
 
-            if (_timeoutMicros == 0)
+            fixed (byte* p = utf8)
             {
-                resultHandle = NativeMethods.ts_parser_parse_string_encoding(
-                    Handle, oldHandle, src, (uint)utf8.Length, (int)InputEncoding.Utf8);
+                // An empty buffer needs a valid (non-null) pointer; tree-sitter reads
+                // `length` bytes regardless. Use a scratch pointer for the zero case.
+                byte scratch = 0;
+                byte* src = utf8.Length == 0 ? &scratch : p;
+
+                if (_timeoutMicros == 0)
+                {
+                    resultHandle = NativeMethods.ts_parser_parse_string_encoding(
+                        Handle, oldHandle, src, (uint)utf8.Length, (int)InputEncoding.Utf8);
+                }
+                else
+                {
+                    resultHandle = ParseWithDeadline(oldHandle, src, (uint)utf8.Length);
+                }
             }
-            else
+
+            if (resultHandle.IsInvalid)
             {
-                resultHandle = ParseWithDeadline(oldHandle, src, (uint)utf8.Length);
+                resultHandle.Dispose();
+                return null;
             }
+
+            return new Tree(resultHandle, utf8, _language!);
         }
-
-        if (resultHandle == IntPtr.Zero)
-            return null;
-
-        return new Tree(resultHandle, utf8, _language!);
+        finally
+        {
+            if (oldRefAdded)
+                oldHandleSafe!.DangerousRelease();
+        }
     }
 
     /// <summary>
@@ -245,7 +258,7 @@ public sealed class Parser : IDisposable
     /// that cancels the parse once the configured timeout elapses. A custom
     /// <see cref="TSInput"/> feeds the in-memory UTF-8 buffer in a single chunk.
     /// </summary>
-    private unsafe IntPtr ParseWithDeadline(IntPtr oldHandle, byte* src, uint length)
+    private unsafe TreeHandle ParseWithDeadline(IntPtr oldHandle, byte* src, uint length)
     {
         long deadlineTicks = Stopwatch.GetTimestamp() +
             (long)((double)_timeoutMicros / 1_000_000.0 * Stopwatch.Frequency);
@@ -320,23 +333,28 @@ public sealed class Parser : IDisposable
         }
     }
 
+    /// <summary>
+    /// Frees the logger <see cref="GCHandle"/> if the parser was not disposed. The
+    /// native parser itself is reclaimed by <see cref="ParserHandle"/>'s critical
+    /// finalizer, so this only releases the managed rooting handle.
+    /// </summary>
+    ~Parser()
+    {
+        if (_selfHandle.IsAllocated)
+            _selfHandle.Free();
+    }
+
     /// <inheritdoc/>
     public void Dispose()
     {
-        DisposeCore();
-        GC.SuppressFinalize(this);
-    }
-
-    private void DisposeCore()
-    {
-        IntPtr handle = Interlocked.Exchange(ref _handle, IntPtr.Zero);
-        if (handle != IntPtr.Zero)
-        {
-            // Detach the logger first so the native side stops referencing our payload.
-            NativeMethods.ts_parser_set_logger(handle, default);
-            NativeMethods.ts_parser_delete(handle);
-        }
+        // Detach the logger while the SafeHandle is still valid so the native side
+        // stops referencing our payload before the parser is released, then dispose
+        // the handle (idempotent) and free the rooting GCHandle.
+        if (!_handle.IsClosed && !_handle.IsInvalid)
+            NativeMethods.ts_parser_set_logger(_handle, default);
+        _handle.Dispose();
         if (_selfHandle.IsAllocated)
             _selfHandle.Free();
+        GC.SuppressFinalize(this);
     }
 }

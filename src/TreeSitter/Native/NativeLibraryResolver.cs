@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
@@ -19,12 +20,16 @@ namespace TreeSitter.Native;
 ///   environment variable, if set.</description></item>
 ///   <item><description><c>runtimes/&lt;rid&gt;/native/</c> beneath
 ///   <see cref="AppContext.BaseDirectory"/> (the standard NuGet runtime layout).</description></item>
-///   <item><description>A plain <see cref="NativeLibrary.Load(string)"/> of the
-///   bare file name, which lets the OS loader plus the application base directory
-///   resolve it (this finds libraries copied next to the assembly).</description></item>
+///   <item><description><c>NativeLibrary.TryLoad</c> with
+///   <see cref="DllImportSearchPath.AssemblyDirectory"/> — the official mechanism to
+///   find a library next to the managed assembly (the flat-copy dev/test layout).</description></item>
 ///   <item><description><c>&lt;repoRoot&gt;/native/&lt;rid&gt;/</c> walking up from
 ///   the base directory, as a developer fallback when running from a build tree.</description></item>
+///   <item><description>A plain <see cref="NativeLibrary.Load(string)"/> of the bare
+///   file name, delegating fully to the OS loader (LD_LIBRARY_PATH, ldconfig, etc.).</description></item>
 /// </list>
+/// Successfully resolved handles are cached by logical name so repeated P/Invoke from
+/// different entry points reuses the same load.
 /// </remarks>
 internal static class NativeLibraryResolver
 {
@@ -32,6 +37,14 @@ internal static class NativeLibraryResolver
     internal const string CoreLibraryName = "tree-sitter";
 
     private static int _installed;
+
+    /// <summary>
+    /// Cache of resolved native handles keyed by logical library name. The OS loader
+    /// already de-duplicates <c>dlopen</c>/<c>LoadLibrary</c> by path, but caching here
+    /// avoids re-running the probing sequence (and the file-system stats it performs)
+    /// on every distinct P/Invoke entry point.
+    /// </summary>
+    private static readonly ConcurrentDictionary<string, IntPtr> _handleCache = new(StringComparer.Ordinal);
 
     /// <summary>
     /// Module initializer: installs the resolver on the TreeSitter assembly the
@@ -72,6 +85,23 @@ internal static class NativeLibraryResolver
         if (!IsTreeSitterLibrary(libraryName))
             return IntPtr.Zero;
 
+        // Reuse a previously resolved handle for this logical name when available.
+        if (_handleCache.TryGetValue(libraryName, out IntPtr cached))
+            return cached;
+
+        IntPtr handle = ResolveCore(libraryName, assembly);
+
+        // Cache only successful resolutions; a zero handle defers to the default
+        // resolver (which surfaces a clear DllNotFoundException for the logical name).
+        if (handle != IntPtr.Zero)
+            _handleCache.TryAdd(libraryName, handle);
+
+        return handle;
+    }
+
+    /// <summary>Runs the full probing sequence for an unresolved logical name.</summary>
+    private static IntPtr ResolveCore(string libraryName, Assembly assembly)
+    {
         string fileName = MapToFileName(libraryName);
         string rid = RuntimeIdentifier;
 
@@ -89,18 +119,27 @@ internal static class NativeLibraryResolver
         if (TryLoadFrom(Path.Combine(baseDir, "runtimes", rid, "native", fileName), out handle))
             return handle;
 
-        // (3) Bare file name -> OS loader + app base directory search. This is the
-        //     normal path for files copied next to the assembly (dev/test runs).
-        if (NativeLibrary.TryLoad(fileName, assembly, searchPath, out handle))
+        // (3) Next to the managed assembly. DllImportSearchPath.AssemblyDirectory is
+        //     the official, cross-platform way to probe the assembly's own directory
+        //     (AppContext.BaseDirectory) for the bare file name; this is the normal
+        //     path for libraries flat-copied beside TreeSitter.dll (dev/test runs and
+        //     project-reference consumers, which do NOT honour runtimes/<rid>/native).
+        if (NativeLibrary.TryLoad(fileName, assembly, DllImportSearchPath.AssemblyDirectory, out handle))
             return handle;
 
-        // Also try an explicit app-base path in case the bare load did not consult it.
+        // Belt-and-braces explicit app-base path in case the search above did not
+        // consult it on some host configuration.
         if (TryLoadFrom(Path.Combine(baseDir, fileName), out handle))
             return handle;
 
         // (4) Developer fallback: walk up from the base directory looking for a
         //     repo-root native/<rid>/ folder (e.g. when running from bin/Debug).
         if (TryLoadFromRepoNative(baseDir, rid, fileName, out handle))
+            return handle;
+
+        // (5) Last resort: bare-name load straight through the OS loader (honours
+        //     LD_LIBRARY_PATH / ldconfig / DYLD_* / PATH and any embedded rpath).
+        if (NativeLibrary.TryLoad(fileName, out handle))
             return handle;
 
         // Give up and let the default resolver try (it will most likely also fail,

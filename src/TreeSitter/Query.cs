@@ -10,7 +10,7 @@ namespace TreeSitter;
 /// </summary>
 public sealed class Query : IDisposable
 {
-    private IntPtr _handle;
+    private readonly QueryHandle _handle;
 
     /// <summary>
     /// Compiles <paramref name="source"/> against <paramref name="language"/>.
@@ -26,24 +26,24 @@ public sealed class Query : IDisposable
         byte[] bytes = Encoding.UTF8.GetBytes(source);
         uint errorOffset;
         int errorType;
-        IntPtr handle;
+        QueryHandle handle;
         fixed (byte* p = bytes)
             handle = NativeMethods.ts_query_new(language.Handle, p, (uint)bytes.Length, &errorOffset, &errorType);
 
-        if (handle == IntPtr.Zero)
+        if (handle.IsInvalid)
+        {
+            handle.Dispose();
             throw new QueryException(errorOffset, (QueryError)errorType);
+        }
 
         _handle = handle;
     }
 
-    /// <summary>Frees the native query if it was not explicitly disposed.</summary>
-    ~Query() => DisposeCore();
-
-    internal IntPtr Handle
+    internal QueryHandle Handle
     {
         get
         {
-            ObjectDisposedException.ThrowIf(_handle == IntPtr.Zero, this);
+            ObjectDisposedException.ThrowIf(_handle.IsClosed || _handle.IsInvalid, this);
             return _handle;
         }
     }
@@ -143,17 +143,9 @@ public sealed class Query : IDisposable
         return result;
     }
 
-    /// <inheritdoc/>
-    public void Dispose()
-    {
-        DisposeCore();
-        GC.SuppressFinalize(this);
-    }
-
-    private void DisposeCore()
-    {
-        IntPtr handle = Interlocked.Exchange(ref _handle, IntPtr.Zero);
-        if (handle != IntPtr.Zero)
-            NativeMethods.ts_query_delete(handle);
-    }
+    /// <summary>
+    /// Disposes the underlying native query. Idempotent: the <see cref="QueryHandle"/>
+    /// owns the critical finalizer and guards against double-free.
+    /// </summary>
+    public void Dispose() => _handle.Dispose();
 }

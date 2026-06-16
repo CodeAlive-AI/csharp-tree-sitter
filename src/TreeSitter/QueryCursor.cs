@@ -9,7 +9,7 @@ namespace TreeSitter;
 /// </summary>
 public sealed class QueryCursor : IDisposable
 {
-    private IntPtr _handle;
+    private readonly QueryCursorHandle _handle;
 
     // The tree whose nodes the most recent Exec() operates on; used to wrap nodes
     // returned in matches.
@@ -18,19 +18,21 @@ public sealed class QueryCursor : IDisposable
     /// <summary>Creates a new query cursor.</summary>
     public QueryCursor()
     {
-        _handle = NativeMethods.ts_query_cursor_new();
-        if (_handle == IntPtr.Zero)
-            throw new TreeSitterException("Failed to allocate a tree-sitter query cursor.");
+        _handle = QueryCursorHandle.Create();
     }
 
-    /// <summary>Frees the native cursor if it was not explicitly disposed.</summary>
-    ~QueryCursor() => DisposeCore();
+    /// <summary>
+    /// Frees the native deadline cell if the cursor was not disposed. The native
+    /// cursor itself is reclaimed by <see cref="QueryCursorHandle"/>'s critical
+    /// finalizer; this only releases the auxiliary unmanaged allocation.
+    /// </summary>
+    ~QueryCursor() => FreeDeadlineCell();
 
-    private IntPtr Handle
+    private QueryCursorHandle Handle
     {
         get
         {
-            ObjectDisposedException.ThrowIf(_handle == IntPtr.Zero, this);
+            ObjectDisposedException.ThrowIf(_handle.IsClosed || _handle.IsInvalid, this);
             return _handle;
         }
     }
@@ -221,18 +223,20 @@ public sealed class QueryCursor : IDisposable
         return new QueryMatch(raw.Id, raw.PatternIndex, captures);
     }
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// Disposes the underlying native cursor (idempotent via
+    /// <see cref="QueryCursorHandle"/>) and frees the auxiliary deadline cell.
+    /// </summary>
     public void Dispose()
     {
-        DisposeCore();
+        _handle.Dispose();
+        FreeDeadlineCell();
         GC.SuppressFinalize(this);
     }
 
-    private unsafe void DisposeCore()
+    /// <summary>Releases the unmanaged deadline cell allocated for timed execution, if any.</summary>
+    private unsafe void FreeDeadlineCell()
     {
-        IntPtr handle = Interlocked.Exchange(ref _handle, IntPtr.Zero);
-        if (handle != IntPtr.Zero)
-            NativeMethods.ts_query_cursor_delete(handle);
         if (_deadlineCell is not null)
         {
             System.Runtime.InteropServices.NativeMemory.Free(_deadlineCell);
