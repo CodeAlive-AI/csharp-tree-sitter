@@ -3,9 +3,11 @@
     <Project Path="src/TreeSitter/TreeSitter.csproj" />
     <Project Path="src/TreeSitter.CodeGen/TreeSitter.CodeGen.csproj" />
     <Project Path="src/TreeSitter.CodeGen.Cli/TreeSitter.CodeGen.Cli.csproj" />
+    <Project Path="src/TreeSitter.LanguagePack/TreeSitter.LanguagePack.csproj" />
   </Folder>
   <Folder Name="/grammars/">
     <Project Path="grammars/TreeSitter.Grammars.Json/TreeSitter.Grammars.Json.csproj" />
+    <Project Path="grammars/TreeSitter.Grammars.Python/TreeSitter.Grammars.Python.csproj" />
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/TreeSitter.Tests/TreeSitter.Tests.csproj" />

@@ -49,43 +49,35 @@
 
   <!--
     ===========================================================================
-    PACK: bundle the pre-built native libraries into the NuGet package under the
-    standard runtimes/<rid>/native/ layout. The .NET host auto-discovers these by
-    RID for published apps; no consumer wiring is required.
+    PACK: bundle ONLY the pre-built tree-sitter ENGINE (libtree-sitter) into the
+    NuGet package under the standard runtimes/<rid>/native/ layout. The .NET host
+    auto-discovers it by RID for published apps; no consumer wiring is required.
 
-    Each item is Condition-guarded on the source file/glob existing so that packing
-    on a host that has only built SOME RIDs (e.g. only linux-x64 here) still
-    succeeds — the absent RID directories simply contribute nothing. Using <None>
-    (not <Content>) keeps these out of THIS library's own build output; the local
-    dev-copy items below handle that case separately.
+    Grammar libraries (libtree-sitter-<lang>.*) are intentionally NOT packed here —
+    they are owned and shipped by the TreeSitter.LanguagePack package, keeping this
+    core package to just the engine.
+
+    Each item is Exists-guarded so packing on a host that built only SOME RIDs (e.g.
+    only linux-x64) still succeeds. Using <None> (not <Content>) keeps these out of
+    THIS library's own build output; the local dev-copy items below handle that case.
 
     $(RepoRoot) is defined in the repo-root Directory.Build.props and ends with a
     directory separator, so "$(RepoRoot)native/..." composes correctly.
     ===========================================================================
   -->
   <ItemGroup>
-    <!-- linux-x64: core runtime + any bundled grammar libs. -->
+    <!-- linux-x64: core engine only. -->
     <None Include="$(RepoRoot)native/linux-x64/libtree-sitter.so"
           Condition="Exists('$(RepoRoot)native/linux-x64/libtree-sitter.so')"
           Pack="true"
           PackagePath="runtimes/linux-x64/native/%(Filename)%(Extension)"
           Visible="false" />
-    <None Include="$(RepoRoot)native/linux-x64/libtree-sitter-*.so"
-          Condition="Exists('$(RepoRoot)native/linux-x64')"
-          Pack="true"
-          PackagePath="runtimes/linux-x64/native/"
-          Visible="false" />
 
-    <!-- osx-arm64 (Apple Silicon): core runtime + any bundled grammar libs. -->
+    <!-- osx-arm64 (Apple Silicon): core engine only. -->
     <None Include="$(RepoRoot)native/osx-arm64/libtree-sitter.dylib"
           Condition="Exists('$(RepoRoot)native/osx-arm64/libtree-sitter.dylib')"
           Pack="true"
           PackagePath="runtimes/osx-arm64/native/%(Filename)%(Extension)"
-          Visible="false" />
-    <None Include="$(RepoRoot)native/osx-arm64/libtree-sitter-*.dylib"
-          Condition="Exists('$(RepoRoot)native/osx-arm64')"
-          Pack="true"
-          PackagePath="runtimes/osx-arm64/native/"
           Visible="false" />
   </ItemGroup>
 

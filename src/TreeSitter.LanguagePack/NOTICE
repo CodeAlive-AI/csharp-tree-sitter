@@ -1,0 +1,16 @@
+TreeSitter.LanguagePack
+=======================
+
+This package bundles `language_definitions.json`, the machine-readable grammar
+manifest from the tree-sitter-language-pack project:
+
+    https://github.com/kreuzberg-dev/tree-sitter-language-pack
+
+The manifest data (repository URLs, pinned revisions, grammar sub-directories,
+C-symbol overrides, file extensions, and ambiguity hints for ~306 languages) is
+used here under the terms of that project's MIT License. All credit for curating
+and maintaining the manifest belongs to the tree-sitter-language-pack authors.
+
+The individual tree-sitter grammars referenced by the manifest are owned by their
+respective upstream authors and distributed under their own licenses; this package
+ships only the manifest plus any locally-built grammar libraries.

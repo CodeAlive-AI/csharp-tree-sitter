@@ -5,9 +5,10 @@
       <DataCollector friendlyName="XPlat code coverage">
         <Configuration>
           <Format>cobertura</Format>
-          <!-- Measure only the two production assemblies the coverage target applies
-               to. Test, third-party, and the CLI/grammar assemblies are excluded. -->
-          <Include>[TreeSitter]*,[TreeSitter.CodeGen]*</Include>
+          <!-- Measure the production assemblies the coverage target applies to.
+               Test, third-party, the CLI, and the generated grammar assemblies are
+               excluded; TreeSitter.LanguagePack is included. -->
+          <Include>[TreeSitter]*,[TreeSitter.CodeGen]*,[TreeSitter.LanguagePack]*</Include>
           <ExcludeByAttribute>Obsolete,GeneratedCodeAttribute,CompilerGeneratedAttribute,ExcludeFromCodeCoverageAttribute</ExcludeByAttribute>
           <!-- Exclude generated grammar bindings from the denominator. -->
           <ExcludeByFile>**/*.g.cs</ExcludeByFile>

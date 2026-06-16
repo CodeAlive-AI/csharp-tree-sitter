@@ -10,7 +10,7 @@ public class TreeSitterException : Exception
     public TreeSitterException(string message) : base(message) { }
 
     /// <summary>Creates a new <see cref="TreeSitterException"/> with a message and inner exception.</summary>
-    public TreeSitterException(string message, Exception innerException) : base(message, innerException) { }
+    public TreeSitterException(string message, Exception? innerException) : base(message, innerException) { }
 }
 
 /// <summary>

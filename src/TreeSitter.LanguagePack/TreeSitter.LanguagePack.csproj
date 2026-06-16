@@ -1,0 +1,104 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <RootNamespace>TreeSitter.LanguagePack</RootNamespace>
+    <AssemblyName>TreeSitter.LanguagePack</AssemblyName>
+
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <LangVersion>latest</LangVersion>
+    <Deterministic>true</Deterministic>
+
+    <!-- Public API documentation; surface all warnings (but don't fail on them). -->
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+
+    <!-- Trim/AOT-friendly: System.Text.Json source generation is used for the manifest. -->
+    <IsTrimmable>true</IsTrimmable>
+    <IsAotCompatible>true</IsAotCompatible>
+
+    <!-- Portable RIDs this pack ships grammar native assets for. -->
+    <RuntimeIdentifiers>linux-x64;osx-arm64;osx-x64;win-x64</RuntimeIdentifiers>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="TreeSitter.Tests" />
+  </ItemGroup>
+
+  <!-- NuGet package metadata. -->
+  <PropertyGroup>
+    <PackageId>TreeSitter.LanguagePack</PackageId>
+    <Authors>CodeAlive-AI</Authors>
+    <Description>Create tree-sitter parsers by name. Embeds the tree-sitter-language-pack manifest (306 languages) and loads the matching native grammar by name, returning a TreeSitter.Language. Bundles a subset of pre-built grammar libraries.</Description>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/CodeAlive-AI/csharp-tree-sitter</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/CodeAlive-AI/csharp-tree-sitter</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageTags>tree-sitter;parser;parsing;syntax-tree;ast;language-pack;grammars</PackageTags>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\TreeSitter\TreeSitter.csproj" />
+  </ItemGroup>
+
+  <!-- Embed the upstream manifest as a resource. Loaded at runtime by Manifests.cs. -->
+  <ItemGroup>
+    <EmbeddedResource Include="language_definitions.json">
+      <LogicalName>TreeSitter.LanguagePack.language_definitions.json</LogicalName>
+    </EmbeddedResource>
+  </ItemGroup>
+
+  <!-- Attribution for the bundled manifest data; carried into the package root. -->
+  <ItemGroup>
+    <None Include="NOTICE" Pack="true" PackagePath="" />
+  </ItemGroup>
+
+  <!--
+    ===========================================================================
+    PACK: this package owns the GRAMMAR native assets. It bundles every built
+    grammar lib (libtree-sitter-<lang>.*) under runtimes/<rid>/native/ so a
+    consuming app auto-discovers them by RID. The CORE libtree-sitter engine is
+    NOT shipped here — that travels with the TreeSitter package.
+
+    Each item is Exists-guarded per RID so packing on a host that built only some
+    RIDs still succeeds. <None> (not <Content>) keeps these out of this library's
+    own build output; the dev-copy items below handle local runs.
+    ===========================================================================
+  -->
+  <ItemGroup>
+    <!-- linux-x64: grammar libs only (exclude the core libtree-sitter.so). -->
+    <None Include="$(RepoRoot)native/linux-x64/libtree-sitter-*.so"
+          Condition="Exists('$(RepoRoot)native/linux-x64')"
+          Pack="true"
+          PackagePath="runtimes/linux-x64/native/"
+          Visible="false" />
+
+    <!-- osx-arm64 (Apple Silicon): grammar libs only. -->
+    <None Include="$(RepoRoot)native/osx-arm64/libtree-sitter-*.dylib"
+          Condition="Exists('$(RepoRoot)native/osx-arm64')"
+          Pack="true"
+          PackagePath="runtimes/osx-arm64/native/"
+          Visible="false" />
+  </ItemGroup>
+
+  <!--
+    ===========================================================================
+    LOCAL DEV / TEST: copy the host RID's grammar libs (and the core runtime so
+    project-reference consumers can parse) next to the built assembly so the
+    NativeLibraryResolver's AssemblyDirectory probe finds them during
+    `dotnet run` / `dotnet test`. Pack="false": the shipping payload is the
+    runtimes/<rid>/native items above (grammars) + the core package (engine).
+    ===========================================================================
+  -->
+  <ItemGroup>
+    <None Include="$(RepoRoot)native/$(NETCoreSdkPortableRuntimeIdentifier)/*.so;$(RepoRoot)native/$(NETCoreSdkPortableRuntimeIdentifier)/*.dylib;$(RepoRoot)native/$(NETCoreSdkPortableRuntimeIdentifier)/*.dll"
+          Condition="Exists('$(RepoRoot)native/$(NETCoreSdkPortableRuntimeIdentifier)')"
+          CopyToOutputDirectory="PreserveNewest"
+          Link="%(Filename)%(Extension)"
+          Pack="false"
+          Visible="false" />
+  </ItemGroup>
+
+</Project>

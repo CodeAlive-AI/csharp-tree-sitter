@@ -39,7 +39,9 @@
     <ProjectReference Include="..\..\src\TreeSitter\TreeSitter.csproj" />
     <ProjectReference Include="..\..\src\TreeSitter.CodeGen\TreeSitter.CodeGen.csproj" />
     <ProjectReference Include="..\..\src\TreeSitter.CodeGen.Cli\TreeSitter.CodeGen.Cli.csproj" />
+    <ProjectReference Include="..\..\src\TreeSitter.LanguagePack\TreeSitter.LanguagePack.csproj" />
     <ProjectReference Include="..\..\grammars\TreeSitter.Grammars.Json\TreeSitter.Grammars.Json.csproj" />
+    <ProjectReference Include="..\..\grammars\TreeSitter.Grammars.Python\TreeSitter.Grammars.Python.csproj" />
   </ItemGroup>
 
   <ItemGroup>
