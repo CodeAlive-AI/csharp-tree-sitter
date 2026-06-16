@@ -1,5 +1,10 @@
 <Solution>
   <Folder Name="/src/">
     <Project Path="src/TreeSitter/TreeSitter.csproj" />
+    <Project Path="src/TreeSitter.CodeGen/TreeSitter.CodeGen.csproj" />
+    <Project Path="src/TreeSitter.CodeGen.Cli/TreeSitter.CodeGen.Cli.csproj" />
+  </Folder>
+  <Folder Name="/grammars/">
+    <Project Path="grammars/TreeSitter.Grammars.Json/TreeSitter.Grammars.Json.csproj" />
   </Folder>
 </Solution>

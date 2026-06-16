@@ -47,20 +47,20 @@ public static class Identifiers
 
     /// <summary>
     /// Determines whether the s-expression node type <paramref name="type"/> contains
-    /// only punctuation characters (no letters/digits). Such unnamed tokens live in
-    /// the <c>Symbols</c> namespace rather than <c>Unnamed</c>.
+    /// any punctuation/symbol character (anything that is not a letter, digit, or
+    /// underscore — including spaces). Such unnamed tokens live in the <c>Symbols</c>
+    /// sub-namespace; purely alphanumeric unnamed tokens (e.g. keyword tokens like
+    /// <c>await</c>) live in <c>Unnamed</c>.
     /// </summary>
     /// <param name="type">The node type string.</param>
-    public static bool IsAllPunctuation(string type)
+    public static bool ContainsPunctuation(string type)
     {
-        if (type.Length == 0)
-            return false;
         foreach (char c in type)
         {
-            if (char.IsLetterOrDigit(c) || c == '_')
-                return false;
+            if (!char.IsLetterOrDigit(c) && c != '_')
+                return true;
         }
-        return true;
+        return false;
     }
 
     /// <summary>
