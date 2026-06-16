@@ -1,0 +1,82 @@
+name: CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+  workflow_dispatch:
+
+# Cancel superseded runs on the same ref to save CI minutes.
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-and-test:
+    name: build & test (${{ matrix.rid }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            rid: linux-x64
+          - os: macos-14        # Apple Silicon runner -> osx-arm64
+            rid: osx-arm64
+
+    steps:
+      - name: Checkout (with submodules)
+        uses: actions/checkout@v4
+        with:
+          # tree-sitter/tree-sitter (and tree-sitter-cpp) are submodules; the native
+          # build needs the core runtime sources.
+          submodules: recursive
+
+      - name: Set up .NET 10
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Build native runtime + test grammars
+        shell: bash
+        run: |
+          # Builds libtree-sitter (from the submodule) plus every grammar the test
+          # suite uses, into native/<rid>/. On macOS, build-native.sh ad-hoc codesigns
+          # each .dylib (mandatory: unsigned dylibs are SIGKILLed on load on arm64).
+          chmod +x build/build-native.sh scripts/fetch-test-grammars.sh
+          scripts/fetch-test-grammars.sh
+
+      - name: List native artifacts
+        shell: bash
+        run: ls -l "native/${{ matrix.rid }}"
+
+      - name: Build solution (Release)
+        run: dotnet build TreeSitter.slnx -c Release
+
+      - name: Test with coverage (Debug)
+        shell: bash
+        env:
+          # Belt-and-braces: the test module initializer also sets this, but exporting
+          # it here makes resolution robust regardless of working directory.
+          TREE_SITTER_NATIVE_PATH: ${{ github.workspace }}/native/${{ matrix.rid }}
+        run: |
+          # Coverage is collected against the Debug configuration: JIT optimizations in
+          # Release distort line/branch mapping, and the coverlet data collector's IL
+          # instrumentation does not mix well with optimized [UnmanagedCallersOnly]
+          # interop thunks. The Release build above validates the optimized compile;
+          # this step produces the coverage report.
+          dotnet test TreeSitter.slnx -c Debug \
+            --collect:"XPlat Code Coverage" \
+            --settings tests/TreeSitter.Tests/coverage.runsettings \
+            --results-directory ./TestResults \
+            --logger "trx;LogFileName=test-results.trx"
+
+      - name: Upload coverage report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-${{ matrix.rid }}
+          path: |
+            ./TestResults/**/coverage.cobertura.xml
+            ./TestResults/**/*.trx
+          if-no-files-found: warn

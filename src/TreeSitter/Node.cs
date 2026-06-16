@@ -34,64 +34,64 @@ public readonly struct Node : IEquatable<Node>
     public bool IsNull => _tree is null || _node.IsZero || NativeMethods.ts_node_is_null(_node);
 
     /// <summary>The node's type as it appears in the API, accounting for aliases (<c>ts_node_type</c>).</summary>
-    public string Kind => Utf8.PtrToString(NativeMethods.ts_node_type(_node)) ?? string.Empty;
+    public string Kind => IsNull ? string.Empty : Utf8.PtrToString(NativeMethods.ts_node_type(_node)) ?? string.Empty;
 
     /// <summary>The node's type as a numeric symbol id (<c>ts_node_symbol</c>).</summary>
-    public ushort KindId => NativeMethods.ts_node_symbol(_node);
+    public ushort KindId => IsNull ? (ushort)0 : NativeMethods.ts_node_symbol(_node);
 
     /// <summary>
     /// The node's type as it appears in the grammar, ignoring aliases
     /// (<c>ts_node_grammar_type</c>), or <see langword="null"/> if unavailable.
     /// </summary>
-    public string? GrammarKind => Utf8.PtrToString(NativeMethods.ts_node_grammar_type(_node));
+    public string? GrammarKind => IsNull ? null : Utf8.PtrToString(NativeMethods.ts_node_grammar_type(_node));
 
     /// <summary>The node's grammar symbol id ignoring aliases (<c>ts_node_grammar_symbol</c>).</summary>
-    public ushort GrammarSymbol => NativeMethods.ts_node_grammar_symbol(_node);
+    public ushort GrammarSymbol => IsNull ? (ushort)0 : NativeMethods.ts_node_grammar_symbol(_node);
 
     /// <summary>Whether the node corresponds to a named rule in the grammar.</summary>
-    public bool IsNamed => NativeMethods.ts_node_is_named(_node);
+    public bool IsNamed => !IsNull && NativeMethods.ts_node_is_named(_node);
 
     /// <summary>Whether the node was inserted by error recovery (a missing node).</summary>
-    public bool IsMissing => NativeMethods.ts_node_is_missing(_node);
+    public bool IsMissing => !IsNull && NativeMethods.ts_node_is_missing(_node);
 
     /// <summary>Whether the node is an extra node (e.g. a comment) not required by the grammar.</summary>
-    public bool IsExtra => NativeMethods.ts_node_is_extra(_node);
+    public bool IsExtra => !IsNull && NativeMethods.ts_node_is_extra(_node);
 
     /// <summary>Whether the node is itself an <c>ERROR</c> node (<c>ts_node_is_error</c>).</summary>
-    public bool IsError => NativeMethods.ts_node_is_error(_node);
+    public bool IsError => !IsNull && NativeMethods.ts_node_is_error(_node);
 
     /// <summary>Whether the node has been edited since the tree was parsed.</summary>
-    public bool HasChanges => NativeMethods.ts_node_has_changes(_node);
+    public bool HasChanges => !IsNull && NativeMethods.ts_node_has_changes(_node);
 
     /// <summary>Whether the node is, or contains, a syntax error.</summary>
-    public bool HasError => NativeMethods.ts_node_has_error(_node);
+    public bool HasError => !IsNull && NativeMethods.ts_node_has_error(_node);
 
     /// <summary>The parse state at this node's position.</summary>
-    public ushort ParseState => NativeMethods.ts_node_parse_state(_node);
+    public ushort ParseState => IsNull ? (ushort)0 : NativeMethods.ts_node_parse_state(_node);
 
     /// <summary>The parse state immediately after this node.</summary>
-    public ushort NextParseState => NativeMethods.ts_node_next_parse_state(_node);
+    public ushort NextParseState => IsNull ? (ushort)0 : NativeMethods.ts_node_next_parse_state(_node);
 
     /// <summary>The byte offset of the start of the node.</summary>
-    public uint StartByte => NativeMethods.ts_node_start_byte(_node);
+    public uint StartByte => IsNull ? 0u : NativeMethods.ts_node_start_byte(_node);
 
     /// <summary>The byte offset one past the end of the node.</summary>
-    public uint EndByte => NativeMethods.ts_node_end_byte(_node);
+    public uint EndByte => IsNull ? 0u : NativeMethods.ts_node_end_byte(_node);
 
     /// <summary>The (row, column) position of the start of the node.</summary>
-    public Point StartPoint => new(NativeMethods.ts_node_start_point(_node));
+    public Point StartPoint => IsNull ? Point.Zero : new(NativeMethods.ts_node_start_point(_node));
 
     /// <summary>The (row, column) position of the end of the node.</summary>
-    public Point EndPoint => new(NativeMethods.ts_node_end_point(_node));
+    public Point EndPoint => IsNull ? Point.Zero : new(NativeMethods.ts_node_end_point(_node));
 
     /// <summary>The node's byte and point range.</summary>
     public Range Range => new(StartPoint, EndPoint, StartByte, EndByte);
 
     /// <summary>The number of descendants of this node, including the node itself.</summary>
-    public uint DescendantCount => NativeMethods.ts_node_descendant_count(_node);
+    public uint DescendantCount => IsNull ? 0u : NativeMethods.ts_node_descendant_count(_node);
 
     /// <summary>The node's immediate parent, or a null node if this is the root.</summary>
-    public Node Parent => Wrap(NativeMethods.ts_node_parent(_node));
+    public Node Parent => IsNull ? default : Wrap(NativeMethods.ts_node_parent(_node));
 
     /// <summary>
     /// The direct child of this node that contains <paramref name="descendant"/>
@@ -100,37 +100,39 @@ public readonly struct Node : IEquatable<Node>
     /// </summary>
     /// <param name="descendant">A descendant of this node.</param>
     public Node ChildWithDescendant(Node descendant) =>
-        Wrap(NativeMethods.ts_node_child_with_descendant(_node, descendant._node));
+        IsNull ? default : Wrap(NativeMethods.ts_node_child_with_descendant(_node, descendant._node));
 
     /// <summary>The total number of children (named and anonymous).</summary>
-    public uint ChildCount => NativeMethods.ts_node_child_count(_node);
+    public uint ChildCount => IsNull ? 0u : NativeMethods.ts_node_child_count(_node);
 
     /// <summary>Gets the child at <paramref name="index"/>, or a null node if out of range.</summary>
     /// <param name="index">The zero-based child index.</param>
-    public Node Child(uint index) => Wrap(NativeMethods.ts_node_child(_node, index));
+    public Node Child(uint index) => IsNull ? default : Wrap(NativeMethods.ts_node_child(_node, index));
 
     /// <summary>The field name of the child at <paramref name="index"/>, or <see langword="null"/>.</summary>
     /// <param name="index">The zero-based child index (over all children).</param>
     public string? FieldNameForChild(uint index) =>
-        Utf8.PtrToString(NativeMethods.ts_node_field_name_for_child(_node, index));
+        IsNull ? null : Utf8.PtrToString(NativeMethods.ts_node_field_name_for_child(_node, index));
 
     /// <summary>The field name of the named child at <paramref name="index"/>, or <see langword="null"/>.</summary>
     /// <param name="index">The zero-based named-child index.</param>
     public string? FieldNameForNamedChild(uint index) =>
-        Utf8.PtrToString(NativeMethods.ts_node_field_name_for_named_child(_node, index));
+        IsNull ? null : Utf8.PtrToString(NativeMethods.ts_node_field_name_for_named_child(_node, index));
 
     /// <summary>The number of named children.</summary>
-    public uint NamedChildCount => NativeMethods.ts_node_named_child_count(_node);
+    public uint NamedChildCount => IsNull ? 0u : NativeMethods.ts_node_named_child_count(_node);
 
     /// <summary>Gets the named child at <paramref name="index"/>, or a null node if out of range.</summary>
     /// <param name="index">The zero-based named-child index.</param>
-    public Node NamedChild(uint index) => Wrap(NativeMethods.ts_node_named_child(_node, index));
+    public Node NamedChild(uint index) => IsNull ? default : Wrap(NativeMethods.ts_node_named_child(_node, index));
 
     /// <summary>Gets the child with the given field name, or a null node if absent.</summary>
     /// <param name="fieldName">The field name.</param>
     public unsafe Node ChildByFieldName(string fieldName)
     {
         ArgumentNullException.ThrowIfNull(fieldName);
+        if (IsNull)
+            return default;
         int byteCount = Utf8.ByteCount(fieldName);
         Span<byte> buffer = byteCount <= 256 ? stackalloc byte[byteCount] : new byte[byteCount];
         Encoding.UTF8.GetBytes(fieldName, buffer);
@@ -141,53 +143,53 @@ public readonly struct Node : IEquatable<Node>
     /// <summary>Gets the child with the given field id, or a null node if absent.</summary>
     /// <param name="fieldId">The field id.</param>
     public Node ChildByFieldId(ushort fieldId) =>
-        Wrap(NativeMethods.ts_node_child_by_field_id(_node, fieldId));
+        IsNull ? default : Wrap(NativeMethods.ts_node_child_by_field_id(_node, fieldId));
 
     /// <summary>The node's next sibling, or a null node if there is none.</summary>
-    public Node NextSibling => Wrap(NativeMethods.ts_node_next_sibling(_node));
+    public Node NextSibling => IsNull ? default : Wrap(NativeMethods.ts_node_next_sibling(_node));
 
     /// <summary>The node's previous sibling, or a null node if there is none.</summary>
-    public Node PrevSibling => Wrap(NativeMethods.ts_node_prev_sibling(_node));
+    public Node PrevSibling => IsNull ? default : Wrap(NativeMethods.ts_node_prev_sibling(_node));
 
     /// <summary>The node's next named sibling, or a null node if there is none.</summary>
-    public Node NextNamedSibling => Wrap(NativeMethods.ts_node_next_named_sibling(_node));
+    public Node NextNamedSibling => IsNull ? default : Wrap(NativeMethods.ts_node_next_named_sibling(_node));
 
     /// <summary>The node's previous named sibling, or a null node if there is none.</summary>
-    public Node PrevNamedSibling => Wrap(NativeMethods.ts_node_prev_named_sibling(_node));
+    public Node PrevNamedSibling => IsNull ? default : Wrap(NativeMethods.ts_node_prev_named_sibling(_node));
 
     /// <summary>The first child that contains or starts after <paramref name="byteOffset"/>.</summary>
     /// <param name="byteOffset">A byte offset.</param>
     public Node FirstChildForByte(uint byteOffset) =>
-        Wrap(NativeMethods.ts_node_first_child_for_byte(_node, byteOffset));
+        IsNull ? default : Wrap(NativeMethods.ts_node_first_child_for_byte(_node, byteOffset));
 
     /// <summary>The first named child that contains or starts after <paramref name="byteOffset"/>.</summary>
     /// <param name="byteOffset">A byte offset.</param>
     public Node FirstNamedChildForByte(uint byteOffset) =>
-        Wrap(NativeMethods.ts_node_first_named_child_for_byte(_node, byteOffset));
+        IsNull ? default : Wrap(NativeMethods.ts_node_first_named_child_for_byte(_node, byteOffset));
 
     /// <summary>The smallest node spanning the given byte range.</summary>
     /// <param name="startByte">The start byte offset (inclusive).</param>
     /// <param name="endByte">The end byte offset (exclusive).</param>
     public Node DescendantForByteRange(uint startByte, uint endByte) =>
-        Wrap(NativeMethods.ts_node_descendant_for_byte_range(_node, startByte, endByte));
+        IsNull ? default : Wrap(NativeMethods.ts_node_descendant_for_byte_range(_node, startByte, endByte));
 
     /// <summary>The smallest node spanning the given point range.</summary>
     /// <param name="start">The start position.</param>
     /// <param name="end">The end position.</param>
     public Node DescendantForPointRange(Point start, Point end) =>
-        Wrap(NativeMethods.ts_node_descendant_for_point_range(_node, start.ToNative(), end.ToNative()));
+        IsNull ? default : Wrap(NativeMethods.ts_node_descendant_for_point_range(_node, start.ToNative(), end.ToNative()));
 
     /// <summary>The smallest named node spanning the given byte range.</summary>
     /// <param name="startByte">The start byte offset (inclusive).</param>
     /// <param name="endByte">The end byte offset (exclusive).</param>
     public Node NamedDescendantForByteRange(uint startByte, uint endByte) =>
-        Wrap(NativeMethods.ts_node_named_descendant_for_byte_range(_node, startByte, endByte));
+        IsNull ? default : Wrap(NativeMethods.ts_node_named_descendant_for_byte_range(_node, startByte, endByte));
 
     /// <summary>The smallest named node spanning the given point range.</summary>
     /// <param name="start">The start position.</param>
     /// <param name="end">The end position.</param>
     public Node NamedDescendantForPointRange(Point start, Point end) =>
-        Wrap(NativeMethods.ts_node_named_descendant_for_point_range(_node, start.ToNative(), end.ToNative()));
+        IsNull ? default : Wrap(NativeMethods.ts_node_named_descendant_for_point_range(_node, start.ToNative(), end.ToNative()));
 
     /// <summary>
     /// Updates this node's stored position to reflect an edit. Because
@@ -198,6 +200,8 @@ public readonly struct Node : IEquatable<Node>
     /// <param name="edit">The edit to apply.</param>
     public unsafe Node Edit(in InputEdit edit)
     {
+        if (IsNull)
+            return this;
         TSNode copy = _node;
         TSInputEdit native = edit.ToNative();
         NativeMethods.ts_node_edit(&copy, &native);
@@ -209,6 +213,8 @@ public readonly struct Node : IEquatable<Node>
     {
         get
         {
+            if (IsNull)
+                return null;
             IntPtr ptr = NativeMethods.ts_node_language(_node);
             return ptr == IntPtr.Zero ? null : _tree?.Language ?? new Language(ptr);
         }
@@ -248,6 +254,8 @@ public readonly struct Node : IEquatable<Node>
     /// </summary>
     public string ToSExpression()
     {
+        if (IsNull)
+            return string.Empty;
         IntPtr ptr = NativeMethods.ts_node_string(_node);
         if (ptr == IntPtr.Zero)
             return string.Empty;

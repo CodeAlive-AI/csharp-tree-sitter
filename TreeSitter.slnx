@@ -7,4 +7,7 @@
   <Folder Name="/grammars/">
     <Project Path="grammars/TreeSitter.Grammars.Json/TreeSitter.Grammars.Json.csproj" />
   </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/TreeSitter.Tests/TreeSitter.Tests.csproj" />
+  </Folder>
 </Solution>

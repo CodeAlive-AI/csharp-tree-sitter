@@ -1,0 +1,63 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <RootNamespace>TreeSitter.Tests</RootNamespace>
+    <AssemblyName>TreeSitter.Tests</AssemblyName>
+
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <LangVersion>latest</LangVersion>
+
+    <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
+
+    <!--
+      xUnit v3 ships a Microsoft.Testing.Platform entry point by default. We run the
+      suite through the classic VSTest host instead (UseMicrosoftTestingPlatformRunner
+      = false) because the coverlet "XPlat Code Coverage" data collector used by
+      `dotnet test` is wired into VSTest. This keeps a single, well-trodden coverage
+      path for both local runs and CI.
+    -->
+    <UseMicrosoftTestingPlatformRunner>false</UseMicrosoftTestingPlatformRunner>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+
+    <!-- Tests intentionally exercise [Obsolete]/disposed/edge paths; don't warn. -->
+    <NoWarn>$(NoWarn);CS1591</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.6.0" />
+    <PackageReference Include="xunit.v3" Version="3.2.2" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="3.1.5" />
+    <PackageReference Include="coverlet.collector" Version="10.0.1" />
+    <PackageReference Include="coverlet.msbuild" Version="10.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\TreeSitter\TreeSitter.csproj" />
+    <ProjectReference Include="..\..\src\TreeSitter.CodeGen\TreeSitter.CodeGen.csproj" />
+    <ProjectReference Include="..\..\src\TreeSitter.CodeGen.Cli\TreeSitter.CodeGen.Cli.csproj" />
+    <ProjectReference Include="..\..\grammars\TreeSitter.Grammars.Json\TreeSitter.Grammars.Json.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="Xunit" />
+  </ItemGroup>
+
+  <!--
+    Copy the host RID's prebuilt native libraries (core runtime + every grammar lib)
+    next to the test assembly so the NativeLibraryResolver's AssemblyDirectory probe
+    finds them regardless of the working directory. The assembly fixture / module
+    initializer also points TREE_SITTER_NATIVE_PATH here as a belt-and-braces measure.
+  -->
+  <ItemGroup>
+    <None Include="$(RepoRoot)native/$(NETCoreSdkPortableRuntimeIdentifier)/*.so;$(RepoRoot)native/$(NETCoreSdkPortableRuntimeIdentifier)/*.dylib;$(RepoRoot)native/$(NETCoreSdkPortableRuntimeIdentifier)/*.dll"
+          Condition="Exists('$(RepoRoot)native/$(NETCoreSdkPortableRuntimeIdentifier)')"
+          CopyToOutputDirectory="PreserveNewest"
+          Link="%(Filename)%(Extension)"
+          Visible="false" />
+  </ItemGroup>
+
+</Project>
