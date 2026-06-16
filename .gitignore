@@ -19,3 +19,10 @@
 *.lib
 *.exp
 *.dll
+
+# Native build outputs (built from source via build/build-native.sh)
+/native/
+*.so
+*.dylib
+*.a
+*.ilk
