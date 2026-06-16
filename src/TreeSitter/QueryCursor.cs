@@ -15,6 +15,11 @@ public sealed class QueryCursor : IDisposable
     // returned in matches.
     private Tree? _tree;
 
+    // The query passed to the most recent Exec(). Rooted here so that the managed
+    // Query (and its QueryHandle) cannot be finalized while matches/captures are
+    // being consumed, since the native cursor keeps using the query's native state.
+    private Query? _query;
+
     /// <summary>Creates a new query cursor.</summary>
     public QueryCursor()
     {
@@ -22,11 +27,11 @@ public sealed class QueryCursor : IDisposable
     }
 
     /// <summary>
-    /// Frees the native deadline cell if the cursor was not disposed. The native
+    /// Frees the native auxiliary cells if the cursor was not disposed. The native
     /// cursor itself is reclaimed by <see cref="QueryCursorHandle"/>'s critical
-    /// finalizer; this only releases the auxiliary unmanaged allocation.
+    /// finalizer; this only releases the auxiliary unmanaged allocations.
     /// </summary>
-    ~QueryCursor() => FreeDeadlineCell();
+    ~QueryCursor() => FreeNativeCells();
 
     private QueryCursorHandle Handle
     {
