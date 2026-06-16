@@ -222,6 +222,11 @@ public sealed class Parser : IDisposable
 
     private unsafe Tree? ParseBytes(byte[] utf8, Tree? oldTree)
     {
+        // Capture the language non-null: callers (Parse overloads) guarantee it via
+        // EnsureLanguage(), so we hold a local rather than dereferencing _language! later.
+        Language language = _language
+            ?? throw new InvalidOperationException("No language has been set on the parser.");
+
         // old_tree is a BORROWED pointer. When present, pin its SafeHandle open with
         // DangerousAddRef so the raw pointer cannot be freed by another thread while
         // the native parse reads it, releasing the ref once the call returns.
@@ -258,7 +263,7 @@ public sealed class Parser : IDisposable
                 return null;
             }
 
-            return new Tree(resultHandle, utf8, _language!);
+            return new Tree(resultHandle, utf8, language);
         }
         finally
         {
