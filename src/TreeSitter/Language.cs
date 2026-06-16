@@ -187,41 +187,46 @@ public sealed class Language
 
     private string?[] EnsureSymbolNames()
     {
-        string?[]? cache = _symbolNames;
+        // Volatile read so a consumer on a weak-memory-model CPU (e.g. osx-arm64) sees a
+        // fully-initialized array, never a partially-constructed one published by another
+        // thread. The write below is paired with Volatile.Write.
+        string?[]? cache = Volatile.Read(ref _symbolNames);
         if (cache is not null)
             return cache;
 
         lock (_cacheLock)
         {
-            if (_symbolNames is not null)
-                return _symbolNames;
+            cache = Volatile.Read(ref _symbolNames);
+            if (cache is not null)
+                return cache;
 
             uint count = SymbolCount;
             var names = new string?[count];
             for (ushort i = 0; i < count; i++)
                 names[i] = Utf8.PtrToString(NativeMethods.ts_language_symbol_name(_handle, i));
-            _symbolNames = names;
+            Volatile.Write(ref _symbolNames, names);
             return names;
         }
     }
 
     private string?[] EnsureFieldNames()
     {
-        string?[]? cache = _fieldNames;
+        string?[]? cache = Volatile.Read(ref _fieldNames);
         if (cache is not null)
             return cache;
 
         lock (_cacheLock)
         {
-            if (_fieldNames is not null)
-                return _fieldNames;
+            cache = Volatile.Read(ref _fieldNames);
+            if (cache is not null)
+                return cache;
 
             // Field ids are 1-based; index 0 is always null. Allocate count + 1.
             uint count = FieldCount;
             var names = new string?[count + 1];
             for (ushort i = 0; i <= count; i++)
                 names[i] = Utf8.PtrToString(NativeMethods.ts_language_field_name_for_id(_handle, i));
-            _fieldNames = names;
+            Volatile.Write(ref _fieldNames, names);
             return names;
         }
     }

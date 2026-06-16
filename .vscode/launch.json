@@ -5,18 +5,17 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "test",
+            "name": "tsgen (codegen CLI)",
             "stopAtEntry": false,
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "build",
             "console": "integratedTerminal",
-            "program": "${workspaceFolder}/bin/Debug/net10.0/csharp-tree-sitter.dll",
+            "program": "${workspaceFolder}/src/TreeSitter.CodeGen.Cli/bin/Debug/net10.0/tsgen.dll",
             "cwd": "${workspaceFolder}",
             "args": [
-                "-files",
-                "path"
-            ],
-        },
+                "--help"
+            ]
+        }
     ]
 }

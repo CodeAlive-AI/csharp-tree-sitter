@@ -19,11 +19,10 @@ namespace TreeSitter.Grammars.Json
         /// <summary>The underlying untyped node.</summary>
         public global::TreeSitter.Node Node { get; }
 
-        /// <summary>Wraps <paramref name="node"/> as a <see cref="Value"/>.</summary>
-        /// <param name="node">The node to wrap; its kind must be accepted.</param>
-        public Value(global::TreeSitter.Node node)
+        /// <summary>Wraps <paramref name="node"/> as a <see cref="Value"/> without any kind check.</summary>
+        /// <param name="node">A node whose kind is already known to be accepted.</param>
+        private Value(global::TreeSitter.Node node)
         {
-            global::System.Diagnostics.Debug.Assert(Accepts(node.Kind), "Node kind '" + node.Kind + "' is not valid for Value.");
             Node = node;
         }
 
@@ -45,9 +44,13 @@ namespace TreeSitter.Grammars.Json
         /// <param name="node">The node to wrap.</param>
         public static Value? TryFrom(global::TreeSitter.Node node) => !node.IsNull && Accepts(node.Kind) ? new Value(node) : null;
 
-        /// <summary>Wraps the node without validation (a debug assert guards the kind).</summary>
+        /// <summary>Wraps the node without validation; a debug assert guards the kind. Use only when the kind is already known.</summary>
         /// <param name="node">An already-validated node.</param>
-        public static Value FromUnchecked(global::TreeSitter.Node node) => new(node);
+        public static Value FromUnchecked(global::TreeSitter.Node node)
+        {
+            global::System.Diagnostics.Debug.Assert(Accepts(node.Kind), "Node kind '" + node.Kind + "' is not valid for Value.");
+            return new(node);
+        }
 
         /// <summary>Discriminates which variant the wrapped node is.</summary>
         public enum Variant
@@ -116,7 +119,7 @@ namespace TreeSitter.Grammars.Json
                 Variant.Object => onObject(TreeSitter.Grammars.Json.Object.FromUnchecked(Node)),
                 Variant.String => onString(TreeSitter.Grammars.Json.String.FromUnchecked(Node)),
                 Variant.True => onTrue(TreeSitter.Grammars.Json.True.FromUnchecked(Node)),
-                _ => throw new global::TreeSitter.Typed.IncorrectNodeKindException(Node, "Variant"),
+                _ => throw new global::TreeSitter.Typed.IncorrectNodeKindException(Node, "Value"),
             };
         }
 
@@ -132,7 +135,7 @@ namespace TreeSitter.Grammars.Json
                 case Variant.Object: onObject(TreeSitter.Grammars.Json.Object.FromUnchecked(Node)); break;
                 case Variant.String: onString(TreeSitter.Grammars.Json.String.FromUnchecked(Node)); break;
                 case Variant.True: onTrue(TreeSitter.Grammars.Json.True.FromUnchecked(Node)); break;
-                default: throw new global::TreeSitter.Typed.IncorrectNodeKindException(Node, "Variant");
+                default: throw new global::TreeSitter.Typed.IncorrectNodeKindException(Node, "Value");
             }
         }
 
@@ -148,11 +151,10 @@ namespace TreeSitter.Grammars.Json
         /// <summary>The underlying untyped node.</summary>
         public global::TreeSitter.Node Node { get; }
 
-        /// <summary>Wraps <paramref name="node"/> as a <see cref="Array"/>.</summary>
-        /// <param name="node">The node to wrap; its kind must be accepted.</param>
-        public Array(global::TreeSitter.Node node)
+        /// <summary>Wraps <paramref name="node"/> as a <see cref="Array"/> without any kind check.</summary>
+        /// <param name="node">A node whose kind is already known to be accepted.</param>
+        private Array(global::TreeSitter.Node node)
         {
-            global::System.Diagnostics.Debug.Assert(Accepts(node.Kind), "Node kind '" + node.Kind + "' is not valid for Array.");
             Node = node;
         }
 
@@ -164,9 +166,13 @@ namespace TreeSitter.Grammars.Json
         /// <param name="node">The node to wrap.</param>
         public static Array? TryFrom(global::TreeSitter.Node node) => !node.IsNull && Accepts(node.Kind) ? new Array(node) : null;
 
-        /// <summary>Wraps the node without validation (a debug assert guards the kind).</summary>
+        /// <summary>Wraps the node without validation; a debug assert guards the kind. Use only when the kind is already known.</summary>
         /// <param name="node">An already-validated node.</param>
-        public static Array FromUnchecked(global::TreeSitter.Node node) => new(node);
+        public static Array FromUnchecked(global::TreeSitter.Node node)
+        {
+            global::System.Diagnostics.Debug.Assert(Accepts(node.Kind), "Node kind '" + node.Kind + "' is not valid for Array.");
+            return new(node);
+        }
         /// <summary>The unnamed children (zero or more), with extras filtered out.</summary>
         public global::System.Collections.Generic.IEnumerable<TreeSitter.Grammars.Json.Value> Values
         {
@@ -191,11 +197,10 @@ namespace TreeSitter.Grammars.Json
         /// <summary>The underlying untyped node.</summary>
         public global::TreeSitter.Node Node { get; }
 
-        /// <summary>Wraps <paramref name="node"/> as a <see cref="Comment"/>.</summary>
-        /// <param name="node">The node to wrap; its kind must be accepted.</param>
-        public Comment(global::TreeSitter.Node node)
+        /// <summary>Wraps <paramref name="node"/> as a <see cref="Comment"/> without any kind check.</summary>
+        /// <param name="node">A node whose kind is already known to be accepted.</param>
+        private Comment(global::TreeSitter.Node node)
         {
-            global::System.Diagnostics.Debug.Assert(Accepts(node.Kind), "Node kind '" + node.Kind + "' is not valid for Comment.");
             Node = node;
         }
 
@@ -207,9 +212,13 @@ namespace TreeSitter.Grammars.Json
         /// <param name="node">The node to wrap.</param>
         public static Comment? TryFrom(global::TreeSitter.Node node) => !node.IsNull && Accepts(node.Kind) ? new Comment(node) : null;
 
-        /// <summary>Wraps the node without validation (a debug assert guards the kind).</summary>
+        /// <summary>Wraps the node without validation; a debug assert guards the kind. Use only when the kind is already known.</summary>
         /// <param name="node">An already-validated node.</param>
-        public static Comment FromUnchecked(global::TreeSitter.Node node) => new(node);
+        public static Comment FromUnchecked(global::TreeSitter.Node node)
+        {
+            global::System.Diagnostics.Debug.Assert(Accepts(node.Kind), "Node kind '" + node.Kind + "' is not valid for Comment.");
+            return new(node);
+        }
     }
 
     /// <summary>The <c>document</c> node.</summary>
@@ -222,11 +231,10 @@ namespace TreeSitter.Grammars.Json
         /// <summary>The underlying untyped node.</summary>
         public global::TreeSitter.Node Node { get; }
 
-        /// <summary>Wraps <paramref name="node"/> as a <see cref="Document"/>.</summary>
-        /// <param name="node">The node to wrap; its kind must be accepted.</param>
-        public Document(global::TreeSitter.Node node)
+        /// <summary>Wraps <paramref name="node"/> as a <see cref="Document"/> without any kind check.</summary>
+        /// <param name="node">A node whose kind is already known to be accepted.</param>
+        private Document(global::TreeSitter.Node node)
         {
-            global::System.Diagnostics.Debug.Assert(Accepts(node.Kind), "Node kind '" + node.Kind + "' is not valid for Document.");
             Node = node;
         }
 
@@ -238,9 +246,13 @@ namespace TreeSitter.Grammars.Json
         /// <param name="node">The node to wrap.</param>
         public static Document? TryFrom(global::TreeSitter.Node node) => !node.IsNull && Accepts(node.Kind) ? new Document(node) : null;
 
-        /// <summary>Wraps the node without validation (a debug assert guards the kind).</summary>
+        /// <summary>Wraps the node without validation; a debug assert guards the kind. Use only when the kind is already known.</summary>
         /// <param name="node">An already-validated node.</param>
-        public static Document FromUnchecked(global::TreeSitter.Node node) => new(node);
+        public static Document FromUnchecked(global::TreeSitter.Node node)
+        {
+            global::System.Diagnostics.Debug.Assert(Accepts(node.Kind), "Node kind '" + node.Kind + "' is not valid for Document.");
+            return new(node);
+        }
         /// <summary>The unnamed children (zero or more), with extras filtered out.</summary>
         public global::System.Collections.Generic.IEnumerable<TreeSitter.Grammars.Json.Value> Values
         {
@@ -265,11 +277,10 @@ namespace TreeSitter.Grammars.Json
         /// <summary>The underlying untyped node.</summary>
         public global::TreeSitter.Node Node { get; }
 
-        /// <summary>Wraps <paramref name="node"/> as a <see cref="EscapeSequence"/>.</summary>
-        /// <param name="node">The node to wrap; its kind must be accepted.</param>
-        public EscapeSequence(global::TreeSitter.Node node)
+        /// <summary>Wraps <paramref name="node"/> as a <see cref="EscapeSequence"/> without any kind check.</summary>
+        /// <param name="node">A node whose kind is already known to be accepted.</param>
+        private EscapeSequence(global::TreeSitter.Node node)
         {
-            global::System.Diagnostics.Debug.Assert(Accepts(node.Kind), "Node kind '" + node.Kind + "' is not valid for EscapeSequence.");
             Node = node;
         }
 
@@ -281,9 +292,13 @@ namespace TreeSitter.Grammars.Json
         /// <param name="node">The node to wrap.</param>
         public static EscapeSequence? TryFrom(global::TreeSitter.Node node) => !node.IsNull && Accepts(node.Kind) ? new EscapeSequence(node) : null;
 
-        /// <summary>Wraps the node without validation (a debug assert guards the kind).</summary>
+        /// <summary>Wraps the node without validation; a debug assert guards the kind. Use only when the kind is already known.</summary>
         /// <param name="node">An already-validated node.</param>
-        public static EscapeSequence FromUnchecked(global::TreeSitter.Node node) => new(node);
+        public static EscapeSequence FromUnchecked(global::TreeSitter.Node node)
+        {
+            global::System.Diagnostics.Debug.Assert(Accepts(node.Kind), "Node kind '" + node.Kind + "' is not valid for EscapeSequence.");
+            return new(node);
+        }
     }
 
     /// <summary>The <c>false</c> node.</summary>
@@ -296,11 +311,10 @@ namespace TreeSitter.Grammars.Json
         /// <summary>The underlying untyped node.</summary>
         public global::TreeSitter.Node Node { get; }
 
-        /// <summary>Wraps <paramref name="node"/> as a <see cref="False"/>.</summary>
-        /// <param name="node">The node to wrap; its kind must be accepted.</param>
-        public False(global::TreeSitter.Node node)
+        /// <summary>Wraps <paramref name="node"/> as a <see cref="False"/> without any kind check.</summary>
+        /// <param name="node">A node whose kind is already known to be accepted.</param>
+        private False(global::TreeSitter.Node node)
         {
-            global::System.Diagnostics.Debug.Assert(Accepts(node.Kind), "Node kind '" + node.Kind + "' is not valid for False.");
             Node = node;
         }
 
@@ -312,9 +326,13 @@ namespace TreeSitter.Grammars.Json
         /// <param name="node">The node to wrap.</param>
         public static False? TryFrom(global::TreeSitter.Node node) => !node.IsNull && Accepts(node.Kind) ? new False(node) : null;
 
-        /// <summary>Wraps the node without validation (a debug assert guards the kind).</summary>
+        /// <summary>Wraps the node without validation; a debug assert guards the kind. Use only when the kind is already known.</summary>
         /// <param name="node">An already-validated node.</param>
-        public static False FromUnchecked(global::TreeSitter.Node node) => new(node);
+        public static False FromUnchecked(global::TreeSitter.Node node)
+        {
+            global::System.Diagnostics.Debug.Assert(Accepts(node.Kind), "Node kind '" + node.Kind + "' is not valid for False.");
+            return new(node);
+        }
     }
 
     /// <summary>The <c>null</c> node.</summary>
@@ -327,11 +345,10 @@ namespace TreeSitter.Grammars.Json
         /// <summary>The underlying untyped node.</summary>
         public global::TreeSitter.Node Node { get; }
 
-        /// <summary>Wraps <paramref name="node"/> as a <see cref="Null"/>.</summary>
-        /// <param name="node">The node to wrap; its kind must be accepted.</param>
-        public Null(global::TreeSitter.Node node)
+        /// <summary>Wraps <paramref name="node"/> as a <see cref="Null"/> without any kind check.</summary>
+        /// <param name="node">A node whose kind is already known to be accepted.</param>
+        private Null(global::TreeSitter.Node node)
         {
-            global::System.Diagnostics.Debug.Assert(Accepts(node.Kind), "Node kind '" + node.Kind + "' is not valid for Null.");
             Node = node;
         }
 
@@ -343,9 +360,13 @@ namespace TreeSitter.Grammars.Json
         /// <param name="node">The node to wrap.</param>
         public static Null? TryFrom(global::TreeSitter.Node node) => !node.IsNull && Accepts(node.Kind) ? new Null(node) : null;
 
-        /// <summary>Wraps the node without validation (a debug assert guards the kind).</summary>
+        /// <summary>Wraps the node without validation; a debug assert guards the kind. Use only when the kind is already known.</summary>
         /// <param name="node">An already-validated node.</param>
-        public static Null FromUnchecked(global::TreeSitter.Node node) => new(node);
+        public static Null FromUnchecked(global::TreeSitter.Node node)
+        {
+            global::System.Diagnostics.Debug.Assert(Accepts(node.Kind), "Node kind '" + node.Kind + "' is not valid for Null.");
+            return new(node);
+        }
     }
 
     /// <summary>The <c>number</c> node.</summary>
@@ -358,11 +379,10 @@ namespace TreeSitter.Grammars.Json
         /// <summary>The underlying untyped node.</summary>
         public global::TreeSitter.Node Node { get; }
 
-        /// <summary>Wraps <paramref name="node"/> as a <see cref="Number"/>.</summary>
-        /// <param name="node">The node to wrap; its kind must be accepted.</param>
-        public Number(global::TreeSitter.Node node)
+        /// <summary>Wraps <paramref name="node"/> as a <see cref="Number"/> without any kind check.</summary>
+        /// <param name="node">A node whose kind is already known to be accepted.</param>
+        private Number(global::TreeSitter.Node node)
         {
-            global::System.Diagnostics.Debug.Assert(Accepts(node.Kind), "Node kind '" + node.Kind + "' is not valid for Number.");
             Node = node;
         }
 
@@ -374,9 +394,13 @@ namespace TreeSitter.Grammars.Json
         /// <param name="node">The node to wrap.</param>
         public static Number? TryFrom(global::TreeSitter.Node node) => !node.IsNull && Accepts(node.Kind) ? new Number(node) : null;
 
-        /// <summary>Wraps the node without validation (a debug assert guards the kind).</summary>
+        /// <summary>Wraps the node without validation; a debug assert guards the kind. Use only when the kind is already known.</summary>
         /// <param name="node">An already-validated node.</param>
-        public static Number FromUnchecked(global::TreeSitter.Node node) => new(node);
+        public static Number FromUnchecked(global::TreeSitter.Node node)
+        {
+            global::System.Diagnostics.Debug.Assert(Accepts(node.Kind), "Node kind '" + node.Kind + "' is not valid for Number.");
+            return new(node);
+        }
     }
 
     /// <summary>The <c>object</c> node.</summary>
@@ -389,11 +413,10 @@ namespace TreeSitter.Grammars.Json
         /// <summary>The underlying untyped node.</summary>
         public global::TreeSitter.Node Node { get; }
 
-        /// <summary>Wraps <paramref name="node"/> as a <see cref="Object"/>.</summary>
-        /// <param name="node">The node to wrap; its kind must be accepted.</param>
-        public Object(global::TreeSitter.Node node)
+        /// <summary>Wraps <paramref name="node"/> as a <see cref="Object"/> without any kind check.</summary>
+        /// <param name="node">A node whose kind is already known to be accepted.</param>
+        private Object(global::TreeSitter.Node node)
         {
-            global::System.Diagnostics.Debug.Assert(Accepts(node.Kind), "Node kind '" + node.Kind + "' is not valid for Object.");
             Node = node;
         }
 
@@ -405,9 +428,13 @@ namespace TreeSitter.Grammars.Json
         /// <param name="node">The node to wrap.</param>
         public static Object? TryFrom(global::TreeSitter.Node node) => !node.IsNull && Accepts(node.Kind) ? new Object(node) : null;
 
-        /// <summary>Wraps the node without validation (a debug assert guards the kind).</summary>
+        /// <summary>Wraps the node without validation; a debug assert guards the kind. Use only when the kind is already known.</summary>
         /// <param name="node">An already-validated node.</param>
-        public static Object FromUnchecked(global::TreeSitter.Node node) => new(node);
+        public static Object FromUnchecked(global::TreeSitter.Node node)
+        {
+            global::System.Diagnostics.Debug.Assert(Accepts(node.Kind), "Node kind '" + node.Kind + "' is not valid for Object.");
+            return new(node);
+        }
         /// <summary>The unnamed children (zero or more), with extras filtered out.</summary>
         public global::System.Collections.Generic.IEnumerable<TreeSitter.Grammars.Json.Pair> Pairs
         {
@@ -432,11 +459,10 @@ namespace TreeSitter.Grammars.Json
         /// <summary>The underlying untyped node.</summary>
         public global::TreeSitter.Node Node { get; }
 
-        /// <summary>Wraps <paramref name="node"/> as a <see cref="Pair"/>.</summary>
-        /// <param name="node">The node to wrap; its kind must be accepted.</param>
-        public Pair(global::TreeSitter.Node node)
+        /// <summary>Wraps <paramref name="node"/> as a <see cref="Pair"/> without any kind check.</summary>
+        /// <param name="node">A node whose kind is already known to be accepted.</param>
+        private Pair(global::TreeSitter.Node node)
         {
-            global::System.Diagnostics.Debug.Assert(Accepts(node.Kind), "Node kind '" + node.Kind + "' is not valid for Pair.");
             Node = node;
         }
 
@@ -448,9 +474,13 @@ namespace TreeSitter.Grammars.Json
         /// <param name="node">The node to wrap.</param>
         public static Pair? TryFrom(global::TreeSitter.Node node) => !node.IsNull && Accepts(node.Kind) ? new Pair(node) : null;
 
-        /// <summary>Wraps the node without validation (a debug assert guards the kind).</summary>
+        /// <summary>Wraps the node without validation; a debug assert guards the kind. Use only when the kind is already known.</summary>
         /// <param name="node">An already-validated node.</param>
-        public static Pair FromUnchecked(global::TreeSitter.Node node) => new(node);
+        public static Pair FromUnchecked(global::TreeSitter.Node node)
+        {
+            global::System.Diagnostics.Debug.Assert(Accepts(node.Kind), "Node kind '" + node.Kind + "' is not valid for Pair.");
+            return new(node);
+        }
         /// <summary>The required <c>key</c> field.</summary>
         /// <exception cref="global::TreeSitter.Typed.IncorrectNodeKindException">The field is absent or has an unexpected kind.</exception>
         public TreeSitter.Grammars.Json.String Key => TreeSitter.Grammars.Json.String.TryFrom(Node.ChildByFieldName("key")) ?? throw new global::TreeSitter.Typed.IncorrectNodeKindException(Node, "TreeSitter.Grammars.Json.String", "key");
@@ -471,11 +501,10 @@ namespace TreeSitter.Grammars.Json
         /// <summary>The underlying untyped node.</summary>
         public global::TreeSitter.Node Node { get; }
 
-        /// <summary>Wraps <paramref name="node"/> as a <see cref="String"/>.</summary>
-        /// <param name="node">The node to wrap; its kind must be accepted.</param>
-        public String(global::TreeSitter.Node node)
+        /// <summary>Wraps <paramref name="node"/> as a <see cref="String"/> without any kind check.</summary>
+        /// <param name="node">A node whose kind is already known to be accepted.</param>
+        private String(global::TreeSitter.Node node)
         {
-            global::System.Diagnostics.Debug.Assert(Accepts(node.Kind), "Node kind '" + node.Kind + "' is not valid for String.");
             Node = node;
         }
 
@@ -487,9 +516,13 @@ namespace TreeSitter.Grammars.Json
         /// <param name="node">The node to wrap.</param>
         public static String? TryFrom(global::TreeSitter.Node node) => !node.IsNull && Accepts(node.Kind) ? new String(node) : null;
 
-        /// <summary>Wraps the node without validation (a debug assert guards the kind).</summary>
+        /// <summary>Wraps the node without validation; a debug assert guards the kind. Use only when the kind is already known.</summary>
         /// <param name="node">An already-validated node.</param>
-        public static String FromUnchecked(global::TreeSitter.Node node) => new(node);
+        public static String FromUnchecked(global::TreeSitter.Node node)
+        {
+            global::System.Diagnostics.Debug.Assert(Accepts(node.Kind), "Node kind '" + node.Kind + "' is not valid for String.");
+            return new(node);
+        }
         /// <summary>The unnamed children (zero or more), with extras filtered out.</summary>
         public global::System.Collections.Generic.IEnumerable<TreeSitter.Grammars.Json.AnonUnions.EscapeSequence_StringContent> Children
         {
@@ -514,11 +547,10 @@ namespace TreeSitter.Grammars.Json
         /// <summary>The underlying untyped node.</summary>
         public global::TreeSitter.Node Node { get; }
 
-        /// <summary>Wraps <paramref name="node"/> as a <see cref="StringContent"/>.</summary>
-        /// <param name="node">The node to wrap; its kind must be accepted.</param>
-        public StringContent(global::TreeSitter.Node node)
+        /// <summary>Wraps <paramref name="node"/> as a <see cref="StringContent"/> without any kind check.</summary>
+        /// <param name="node">A node whose kind is already known to be accepted.</param>
+        private StringContent(global::TreeSitter.Node node)
         {
-            global::System.Diagnostics.Debug.Assert(Accepts(node.Kind), "Node kind '" + node.Kind + "' is not valid for StringContent.");
             Node = node;
         }
 
@@ -530,9 +562,13 @@ namespace TreeSitter.Grammars.Json
         /// <param name="node">The node to wrap.</param>
         public static StringContent? TryFrom(global::TreeSitter.Node node) => !node.IsNull && Accepts(node.Kind) ? new StringContent(node) : null;
 
-        /// <summary>Wraps the node without validation (a debug assert guards the kind).</summary>
+        /// <summary>Wraps the node without validation; a debug assert guards the kind. Use only when the kind is already known.</summary>
         /// <param name="node">An already-validated node.</param>
-        public static StringContent FromUnchecked(global::TreeSitter.Node node) => new(node);
+        public static StringContent FromUnchecked(global::TreeSitter.Node node)
+        {
+            global::System.Diagnostics.Debug.Assert(Accepts(node.Kind), "Node kind '" + node.Kind + "' is not valid for StringContent.");
+            return new(node);
+        }
     }
 
     /// <summary>The <c>true</c> node.</summary>
@@ -545,11 +581,10 @@ namespace TreeSitter.Grammars.Json
         /// <summary>The underlying untyped node.</summary>
         public global::TreeSitter.Node Node { get; }
 
-        /// <summary>Wraps <paramref name="node"/> as a <see cref="True"/>.</summary>
-        /// <param name="node">The node to wrap; its kind must be accepted.</param>
-        public True(global::TreeSitter.Node node)
+        /// <summary>Wraps <paramref name="node"/> as a <see cref="True"/> without any kind check.</summary>
+        /// <param name="node">A node whose kind is already known to be accepted.</param>
+        private True(global::TreeSitter.Node node)
         {
-            global::System.Diagnostics.Debug.Assert(Accepts(node.Kind), "Node kind '" + node.Kind + "' is not valid for True.");
             Node = node;
         }
 
@@ -561,9 +596,13 @@ namespace TreeSitter.Grammars.Json
         /// <param name="node">The node to wrap.</param>
         public static True? TryFrom(global::TreeSitter.Node node) => !node.IsNull && Accepts(node.Kind) ? new True(node) : null;
 
-        /// <summary>Wraps the node without validation (a debug assert guards the kind).</summary>
+        /// <summary>Wraps the node without validation; a debug assert guards the kind. Use only when the kind is already known.</summary>
         /// <param name="node">An already-validated node.</param>
-        public static True FromUnchecked(global::TreeSitter.Node node) => new(node);
+        public static True FromUnchecked(global::TreeSitter.Node node)
+        {
+            global::System.Diagnostics.Debug.Assert(Accepts(node.Kind), "Node kind '" + node.Kind + "' is not valid for True.");
+            return new(node);
+        }
     }
 
 }
@@ -580,11 +619,10 @@ namespace TreeSitter.Grammars.Json.Symbols
         /// <summary>The underlying untyped node.</summary>
         public global::TreeSitter.Node Node { get; }
 
-        /// <summary>Wraps <paramref name="node"/> as a <see cref="Quote"/>.</summary>
-        /// <param name="node">The node to wrap; its kind must be accepted.</param>
-        public Quote(global::TreeSitter.Node node)
+        /// <summary>Wraps <paramref name="node"/> as a <see cref="Quote"/> without any kind check.</summary>
+        /// <param name="node">A node whose kind is already known to be accepted.</param>
+        private Quote(global::TreeSitter.Node node)
         {
-            global::System.Diagnostics.Debug.Assert(Accepts(node.Kind), "Node kind '" + node.Kind + "' is not valid for Quote.");
             Node = node;
         }
 
@@ -596,9 +634,13 @@ namespace TreeSitter.Grammars.Json.Symbols
         /// <param name="node">The node to wrap.</param>
         public static Quote? TryFrom(global::TreeSitter.Node node) => !node.IsNull && Accepts(node.Kind) ? new Quote(node) : null;
 
-        /// <summary>Wraps the node without validation (a debug assert guards the kind).</summary>
+        /// <summary>Wraps the node without validation; a debug assert guards the kind. Use only when the kind is already known.</summary>
         /// <param name="node">An already-validated node.</param>
-        public static Quote FromUnchecked(global::TreeSitter.Node node) => new(node);
+        public static Quote FromUnchecked(global::TreeSitter.Node node)
+        {
+            global::System.Diagnostics.Debug.Assert(Accepts(node.Kind), "Node kind '" + node.Kind + "' is not valid for Quote.");
+            return new(node);
+        }
     }
 
     /// <summary>The <c>,</c> token.</summary>
@@ -611,11 +653,10 @@ namespace TreeSitter.Grammars.Json.Symbols
         /// <summary>The underlying untyped node.</summary>
         public global::TreeSitter.Node Node { get; }
 
-        /// <summary>Wraps <paramref name="node"/> as a <see cref="Comma"/>.</summary>
-        /// <param name="node">The node to wrap; its kind must be accepted.</param>
-        public Comma(global::TreeSitter.Node node)
+        /// <summary>Wraps <paramref name="node"/> as a <see cref="Comma"/> without any kind check.</summary>
+        /// <param name="node">A node whose kind is already known to be accepted.</param>
+        private Comma(global::TreeSitter.Node node)
         {
-            global::System.Diagnostics.Debug.Assert(Accepts(node.Kind), "Node kind '" + node.Kind + "' is not valid for Comma.");
             Node = node;
         }
 
@@ -627,9 +668,13 @@ namespace TreeSitter.Grammars.Json.Symbols
         /// <param name="node">The node to wrap.</param>
         public static Comma? TryFrom(global::TreeSitter.Node node) => !node.IsNull && Accepts(node.Kind) ? new Comma(node) : null;
 
-        /// <summary>Wraps the node without validation (a debug assert guards the kind).</summary>
+        /// <summary>Wraps the node without validation; a debug assert guards the kind. Use only when the kind is already known.</summary>
         /// <param name="node">An already-validated node.</param>
-        public static Comma FromUnchecked(global::TreeSitter.Node node) => new(node);
+        public static Comma FromUnchecked(global::TreeSitter.Node node)
+        {
+            global::System.Diagnostics.Debug.Assert(Accepts(node.Kind), "Node kind '" + node.Kind + "' is not valid for Comma.");
+            return new(node);
+        }
     }
 
     /// <summary>The <c>:</c> token.</summary>
@@ -642,11 +687,10 @@ namespace TreeSitter.Grammars.Json.Symbols
         /// <summary>The underlying untyped node.</summary>
         public global::TreeSitter.Node Node { get; }
 
-        /// <summary>Wraps <paramref name="node"/> as a <see cref="Colon"/>.</summary>
-        /// <param name="node">The node to wrap; its kind must be accepted.</param>
-        public Colon(global::TreeSitter.Node node)
+        /// <summary>Wraps <paramref name="node"/> as a <see cref="Colon"/> without any kind check.</summary>
+        /// <param name="node">A node whose kind is already known to be accepted.</param>
+        private Colon(global::TreeSitter.Node node)
         {
-            global::System.Diagnostics.Debug.Assert(Accepts(node.Kind), "Node kind '" + node.Kind + "' is not valid for Colon.");
             Node = node;
         }
 
@@ -658,9 +702,13 @@ namespace TreeSitter.Grammars.Json.Symbols
         /// <param name="node">The node to wrap.</param>
         public static Colon? TryFrom(global::TreeSitter.Node node) => !node.IsNull && Accepts(node.Kind) ? new Colon(node) : null;
 
-        /// <summary>Wraps the node without validation (a debug assert guards the kind).</summary>
+        /// <summary>Wraps the node without validation; a debug assert guards the kind. Use only when the kind is already known.</summary>
         /// <param name="node">An already-validated node.</param>
-        public static Colon FromUnchecked(global::TreeSitter.Node node) => new(node);
+        public static Colon FromUnchecked(global::TreeSitter.Node node)
+        {
+            global::System.Diagnostics.Debug.Assert(Accepts(node.Kind), "Node kind '" + node.Kind + "' is not valid for Colon.");
+            return new(node);
+        }
     }
 
     /// <summary>The <c>[</c> token.</summary>
@@ -673,11 +721,10 @@ namespace TreeSitter.Grammars.Json.Symbols
         /// <summary>The underlying untyped node.</summary>
         public global::TreeSitter.Node Node { get; }
 
-        /// <summary>Wraps <paramref name="node"/> as a <see cref="LBracket"/>.</summary>
-        /// <param name="node">The node to wrap; its kind must be accepted.</param>
-        public LBracket(global::TreeSitter.Node node)
+        /// <summary>Wraps <paramref name="node"/> as a <see cref="LBracket"/> without any kind check.</summary>
+        /// <param name="node">A node whose kind is already known to be accepted.</param>
+        private LBracket(global::TreeSitter.Node node)
         {
-            global::System.Diagnostics.Debug.Assert(Accepts(node.Kind), "Node kind '" + node.Kind + "' is not valid for LBracket.");
             Node = node;
         }
 
@@ -689,9 +736,13 @@ namespace TreeSitter.Grammars.Json.Symbols
         /// <param name="node">The node to wrap.</param>
         public static LBracket? TryFrom(global::TreeSitter.Node node) => !node.IsNull && Accepts(node.Kind) ? new LBracket(node) : null;
 
-        /// <summary>Wraps the node without validation (a debug assert guards the kind).</summary>
+        /// <summary>Wraps the node without validation; a debug assert guards the kind. Use only when the kind is already known.</summary>
         /// <param name="node">An already-validated node.</param>
-        public static LBracket FromUnchecked(global::TreeSitter.Node node) => new(node);
+        public static LBracket FromUnchecked(global::TreeSitter.Node node)
+        {
+            global::System.Diagnostics.Debug.Assert(Accepts(node.Kind), "Node kind '" + node.Kind + "' is not valid for LBracket.");
+            return new(node);
+        }
     }
 
     /// <summary>The <c>]</c> token.</summary>
@@ -704,11 +755,10 @@ namespace TreeSitter.Grammars.Json.Symbols
         /// <summary>The underlying untyped node.</summary>
         public global::TreeSitter.Node Node { get; }
 
-        /// <summary>Wraps <paramref name="node"/> as a <see cref="RBracket"/>.</summary>
-        /// <param name="node">The node to wrap; its kind must be accepted.</param>
-        public RBracket(global::TreeSitter.Node node)
+        /// <summary>Wraps <paramref name="node"/> as a <see cref="RBracket"/> without any kind check.</summary>
+        /// <param name="node">A node whose kind is already known to be accepted.</param>
+        private RBracket(global::TreeSitter.Node node)
         {
-            global::System.Diagnostics.Debug.Assert(Accepts(node.Kind), "Node kind '" + node.Kind + "' is not valid for RBracket.");
             Node = node;
         }
 
@@ -720,9 +770,13 @@ namespace TreeSitter.Grammars.Json.Symbols
         /// <param name="node">The node to wrap.</param>
         public static RBracket? TryFrom(global::TreeSitter.Node node) => !node.IsNull && Accepts(node.Kind) ? new RBracket(node) : null;
 
-        /// <summary>Wraps the node without validation (a debug assert guards the kind).</summary>
+        /// <summary>Wraps the node without validation; a debug assert guards the kind. Use only when the kind is already known.</summary>
         /// <param name="node">An already-validated node.</param>
-        public static RBracket FromUnchecked(global::TreeSitter.Node node) => new(node);
+        public static RBracket FromUnchecked(global::TreeSitter.Node node)
+        {
+            global::System.Diagnostics.Debug.Assert(Accepts(node.Kind), "Node kind '" + node.Kind + "' is not valid for RBracket.");
+            return new(node);
+        }
     }
 
     /// <summary>The <c>{</c> token.</summary>
@@ -735,11 +789,10 @@ namespace TreeSitter.Grammars.Json.Symbols
         /// <summary>The underlying untyped node.</summary>
         public global::TreeSitter.Node Node { get; }
 
-        /// <summary>Wraps <paramref name="node"/> as a <see cref="LBrace"/>.</summary>
-        /// <param name="node">The node to wrap; its kind must be accepted.</param>
-        public LBrace(global::TreeSitter.Node node)
+        /// <summary>Wraps <paramref name="node"/> as a <see cref="LBrace"/> without any kind check.</summary>
+        /// <param name="node">A node whose kind is already known to be accepted.</param>
+        private LBrace(global::TreeSitter.Node node)
         {
-            global::System.Diagnostics.Debug.Assert(Accepts(node.Kind), "Node kind '" + node.Kind + "' is not valid for LBrace.");
             Node = node;
         }
 
@@ -751,9 +804,13 @@ namespace TreeSitter.Grammars.Json.Symbols
         /// <param name="node">The node to wrap.</param>
         public static LBrace? TryFrom(global::TreeSitter.Node node) => !node.IsNull && Accepts(node.Kind) ? new LBrace(node) : null;
 
-        /// <summary>Wraps the node without validation (a debug assert guards the kind).</summary>
+        /// <summary>Wraps the node without validation; a debug assert guards the kind. Use only when the kind is already known.</summary>
         /// <param name="node">An already-validated node.</param>
-        public static LBrace FromUnchecked(global::TreeSitter.Node node) => new(node);
+        public static LBrace FromUnchecked(global::TreeSitter.Node node)
+        {
+            global::System.Diagnostics.Debug.Assert(Accepts(node.Kind), "Node kind '" + node.Kind + "' is not valid for LBrace.");
+            return new(node);
+        }
     }
 
     /// <summary>The <c>}</c> token.</summary>
@@ -766,11 +823,10 @@ namespace TreeSitter.Grammars.Json.Symbols
         /// <summary>The underlying untyped node.</summary>
         public global::TreeSitter.Node Node { get; }
 
-        /// <summary>Wraps <paramref name="node"/> as a <see cref="RBrace"/>.</summary>
-        /// <param name="node">The node to wrap; its kind must be accepted.</param>
-        public RBrace(global::TreeSitter.Node node)
+        /// <summary>Wraps <paramref name="node"/> as a <see cref="RBrace"/> without any kind check.</summary>
+        /// <param name="node">A node whose kind is already known to be accepted.</param>
+        private RBrace(global::TreeSitter.Node node)
         {
-            global::System.Diagnostics.Debug.Assert(Accepts(node.Kind), "Node kind '" + node.Kind + "' is not valid for RBrace.");
             Node = node;
         }
 
@@ -782,9 +838,13 @@ namespace TreeSitter.Grammars.Json.Symbols
         /// <param name="node">The node to wrap.</param>
         public static RBrace? TryFrom(global::TreeSitter.Node node) => !node.IsNull && Accepts(node.Kind) ? new RBrace(node) : null;
 
-        /// <summary>Wraps the node without validation (a debug assert guards the kind).</summary>
+        /// <summary>Wraps the node without validation; a debug assert guards the kind. Use only when the kind is already known.</summary>
         /// <param name="node">An already-validated node.</param>
-        public static RBrace FromUnchecked(global::TreeSitter.Node node) => new(node);
+        public static RBrace FromUnchecked(global::TreeSitter.Node node)
+        {
+            global::System.Diagnostics.Debug.Assert(Accepts(node.Kind), "Node kind '" + node.Kind + "' is not valid for RBrace.");
+            return new(node);
+        }
     }
 
 }
@@ -798,11 +858,10 @@ namespace TreeSitter.Grammars.Json.AnonUnions
         /// <summary>The underlying untyped node.</summary>
         public global::TreeSitter.Node Node { get; }
 
-        /// <summary>Wraps <paramref name="node"/> as a <see cref="EscapeSequence_StringContent"/>.</summary>
-        /// <param name="node">The node to wrap; its kind must be accepted.</param>
-        public EscapeSequence_StringContent(global::TreeSitter.Node node)
+        /// <summary>Wraps <paramref name="node"/> as a <see cref="EscapeSequence_StringContent"/> without any kind check.</summary>
+        /// <param name="node">A node whose kind is already known to be accepted.</param>
+        private EscapeSequence_StringContent(global::TreeSitter.Node node)
         {
-            global::System.Diagnostics.Debug.Assert(Accepts(node.Kind), "Node kind '" + node.Kind + "' is not valid for EscapeSequence_StringContent.");
             Node = node;
         }
 
@@ -819,9 +878,13 @@ namespace TreeSitter.Grammars.Json.AnonUnions
         /// <param name="node">The node to wrap.</param>
         public static EscapeSequence_StringContent? TryFrom(global::TreeSitter.Node node) => !node.IsNull && Accepts(node.Kind) ? new EscapeSequence_StringContent(node) : null;
 
-        /// <summary>Wraps the node without validation (a debug assert guards the kind).</summary>
+        /// <summary>Wraps the node without validation; a debug assert guards the kind. Use only when the kind is already known.</summary>
         /// <param name="node">An already-validated node.</param>
-        public static EscapeSequence_StringContent FromUnchecked(global::TreeSitter.Node node) => new(node);
+        public static EscapeSequence_StringContent FromUnchecked(global::TreeSitter.Node node)
+        {
+            global::System.Diagnostics.Debug.Assert(Accepts(node.Kind), "Node kind '" + node.Kind + "' is not valid for EscapeSequence_StringContent.");
+            return new(node);
+        }
 
         /// <summary>Discriminates which variant the wrapped node is.</summary>
         public enum Variant
@@ -855,7 +918,7 @@ namespace TreeSitter.Grammars.Json.AnonUnions
             {
                 Variant.EscapeSequence => onEscapeSequence(TreeSitter.Grammars.Json.EscapeSequence.FromUnchecked(Node)),
                 Variant.StringContent => onStringContent(TreeSitter.Grammars.Json.StringContent.FromUnchecked(Node)),
-                _ => throw new global::TreeSitter.Typed.IncorrectNodeKindException(Node, "Variant"),
+                _ => throw new global::TreeSitter.Typed.IncorrectNodeKindException(Node, "EscapeSequence_StringContent"),
             };
         }
 
@@ -866,7 +929,7 @@ namespace TreeSitter.Grammars.Json.AnonUnions
             {
                 case Variant.EscapeSequence: onEscapeSequence(TreeSitter.Grammars.Json.EscapeSequence.FromUnchecked(Node)); break;
                 case Variant.StringContent: onStringContent(TreeSitter.Grammars.Json.StringContent.FromUnchecked(Node)); break;
-                default: throw new global::TreeSitter.Typed.IncorrectNodeKindException(Node, "Variant");
+                default: throw new global::TreeSitter.Typed.IncorrectNodeKindException(Node, "EscapeSequence_StringContent");
             }
         }
 

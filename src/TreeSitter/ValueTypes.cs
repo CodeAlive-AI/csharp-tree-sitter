@@ -41,8 +41,13 @@ public readonly record struct Range(Point StartPoint, Point EndPoint, uint Start
         EndByte = EndByte,
     };
 
-    /// <summary>The number of bytes spanned by this range.</summary>
-    public uint ByteLength => EndByte - StartByte;
+    /// <summary>
+    /// The number of bytes spanned by this range. Returns <c>0</c> for an inverted
+    /// range (<see cref="EndByte"/> &lt; <see cref="StartByte"/>) rather than underflowing
+    /// the unsigned subtraction. Ranges produced by tree-sitter are always well-formed;
+    /// the guard only matters for hand-constructed values.
+    /// </summary>
+    public uint ByteLength => EndByte > StartByte ? EndByte - StartByte : 0u;
 }
 
 /// <summary>

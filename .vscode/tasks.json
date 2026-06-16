@@ -7,19 +7,19 @@
             "type": "process",
             "args": [
                 "build",
-                "${workspaceFolder}/csharp-tree-sitter.csproj",
+                "${workspaceFolder}/TreeSitter.slnx",
                 "/property:GenerateFullPaths=true",
                 "/consoleloggerparameters:NoSummary"
             ],
             "problemMatcher": "$msCompile"
         },
         {
-            "label": "publish",
+            "label": "test",
             "command": "dotnet",
             "type": "process",
             "args": [
-                "publish",
-                "${workspaceFolder}/csharp-tree-sitter.csproj",
+                "test",
+                "${workspaceFolder}/TreeSitter.slnx",
                 "/property:GenerateFullPaths=true",
                 "/consoleloggerparameters:NoSummary"
             ],
@@ -31,9 +31,9 @@
             "type": "process",
             "args": [
                 "watch",
-                "run",
+                "test",
                 "--project",
-                "${workspaceFolder}/csharp-tree-sitter.csproj"
+                "${workspaceFolder}/tests/TreeSitter.Tests/TreeSitter.Tests.csproj"
             ],
             "problemMatcher": "$msCompile"
         }

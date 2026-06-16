@@ -1,5 +1,3 @@
-using System.Diagnostics;
-
 namespace TreeSitter.Typed;
 
 /// <summary>
@@ -59,13 +57,9 @@ public readonly struct UntypedNode : ITypedNode<UntypedNode>
 /// </summary>
 public readonly struct ExtraNode : ITypedNode<ExtraNode>
 {
-    /// <summary>Creates an <see cref="ExtraNode"/> wrapping <paramref name="node"/>.</summary>
+    /// <summary>Wraps <paramref name="node"/> without any check. The caller guarantees extra-ness.</summary>
     /// <param name="node">An extra node.</param>
-    public ExtraNode(Node node)
-    {
-        Debug.Assert(node.IsExtra, "ExtraNode must wrap an extra node.");
-        Node = node;
-    }
+    private ExtraNode(Node node) => Node = node;
 
     /// <inheritdoc/>
     public Node Node { get; }
@@ -79,6 +73,16 @@ public readonly struct ExtraNode : ITypedNode<ExtraNode>
     public static ExtraNode? TryFrom(Node node) =>
         !node.IsNull && node.IsExtra ? new ExtraNode(node) : null;
 
+    /// <summary>
+    /// Wraps <paramref name="node"/>, throwing if it is not an extra node. Unlike a
+    /// kind-checked typed node, extra-ness is a runtime property, so this throwing
+    /// factory is the checked construction surface (in all build configurations).
+    /// </summary>
+    /// <param name="node">The node to wrap.</param>
+    /// <exception cref="IncorrectNodeKindException"><paramref name="node"/> is null or not an extra node.</exception>
+    public static ExtraNode Wrap(Node node) =>
+        TryFrom(node) ?? throw new IncorrectNodeKindException(node, nameof(ExtraNode), "an extra node");
+
     /// <summary>Wraps <paramref name="node"/> without validation.</summary>
     /// <param name="node">The node to wrap.</param>
     public static ExtraNode FromUnchecked(Node node) => new(node);
@@ -90,13 +94,9 @@ public readonly struct ExtraNode : ITypedNode<ExtraNode>
 /// </summary>
 public readonly struct ErrorNode : ITypedNode<ErrorNode>
 {
-    /// <summary>Creates an <see cref="ErrorNode"/> wrapping <paramref name="node"/>.</summary>
+    /// <summary>Wraps <paramref name="node"/> without any check. The caller guarantees error-ness.</summary>
     /// <param name="node">An error node.</param>
-    public ErrorNode(Node node)
-    {
-        Debug.Assert(node.IsError, "ErrorNode must wrap an error node.");
-        Node = node;
-    }
+    private ErrorNode(Node node) => Node = node;
 
     /// <inheritdoc/>
     public Node Node { get; }
@@ -110,6 +110,16 @@ public readonly struct ErrorNode : ITypedNode<ErrorNode>
     public static ErrorNode? TryFrom(Node node) =>
         !node.IsNull && node.IsError ? new ErrorNode(node) : null;
 
+    /// <summary>
+    /// Wraps <paramref name="node"/>, throwing if it is not an error node. Unlike a
+    /// kind-checked typed node, error-ness is a runtime property, so this throwing
+    /// factory is the checked construction surface (in all build configurations).
+    /// </summary>
+    /// <param name="node">The node to wrap.</param>
+    /// <exception cref="IncorrectNodeKindException"><paramref name="node"/> is null or not an error node.</exception>
+    public static ErrorNode Wrap(Node node) =>
+        TryFrom(node) ?? throw new IncorrectNodeKindException(node, nameof(ErrorNode), "an error node");
+
     /// <summary>Wraps <paramref name="node"/> without validation.</summary>
     /// <param name="node">The node to wrap.</param>
     public static ErrorNode FromUnchecked(Node node) => new(node);
@@ -121,13 +131,9 @@ public readonly struct ErrorNode : ITypedNode<ErrorNode>
 /// </summary>
 public readonly struct MissingNode : ITypedNode<MissingNode>
 {
-    /// <summary>Creates a <see cref="MissingNode"/> wrapping <paramref name="node"/>.</summary>
+    /// <summary>Wraps <paramref name="node"/> without any check. The caller guarantees missing-ness.</summary>
     /// <param name="node">A missing node.</param>
-    public MissingNode(Node node)
-    {
-        Debug.Assert(node.IsMissing, "MissingNode must wrap a missing node.");
-        Node = node;
-    }
+    private MissingNode(Node node) => Node = node;
 
     /// <inheritdoc/>
     public Node Node { get; }
@@ -140,6 +146,16 @@ public readonly struct MissingNode : ITypedNode<MissingNode>
     /// <param name="node">The node to wrap.</param>
     public static MissingNode? TryFrom(Node node) =>
         !node.IsNull && node.IsMissing ? new MissingNode(node) : null;
+
+    /// <summary>
+    /// Wraps <paramref name="node"/>, throwing if it is not a missing node. Unlike a
+    /// kind-checked typed node, missing-ness is a runtime property, so this throwing
+    /// factory is the checked construction surface (in all build configurations).
+    /// </summary>
+    /// <param name="node">The node to wrap.</param>
+    /// <exception cref="IncorrectNodeKindException"><paramref name="node"/> is null or not a missing node.</exception>
+    public static MissingNode Wrap(Node node) =>
+        TryFrom(node) ?? throw new IncorrectNodeKindException(node, nameof(MissingNode), "a missing node");
 
     /// <summary>Wraps <paramref name="node"/> without validation.</summary>
     /// <param name="node">The node to wrap.</param>

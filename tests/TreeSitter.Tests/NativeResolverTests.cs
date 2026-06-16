@@ -126,10 +126,17 @@ public class NativeResolverTests
     [Fact]
     public void Install_is_idempotent()
     {
-        // Already installed by the module initializer; calling again is a no-op.
+        // Already installed by the module initializer; calling again must not throw and
+        // must leave a working resolver. Observe that by resolving the core library after
+        // the redundant installs and getting a stable, non-null handle.
         NativeLibraryResolver.Install();
         NativeLibraryResolver.Install();
-        Assert.True(true);
+
+        Assembly asm = typeof(NativeLibraryResolver).Assembly;
+        IntPtr first = NativeLibraryResolver.Resolve("tree-sitter", asm, null);
+        IntPtr second = NativeLibraryResolver.Resolve("tree-sitter", asm, null);
+        Assert.NotEqual(IntPtr.Zero, first);
+        Assert.Equal(first, second);
     }
 
     /// <summary>The portable RID for the current host (matches native/&lt;rid&gt;).</summary>

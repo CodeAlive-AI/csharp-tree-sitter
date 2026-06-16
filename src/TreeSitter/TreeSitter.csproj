@@ -23,9 +23,12 @@
       Portable RIDs this binding ships native assets for. This communicates the
       supported platforms to NuGet restore; it does NOT force multi-RID output in a
       single build (the consuming app picks one at publish time via RuntimeIdentifier).
-      osx-x64 is listed for legacy Intel Macs even though we do not bundle it here yet.
+      Narrowed to the RIDs we actually bundle native engine binaries for, so a publish
+      targeting an unbundled RID fails fast at restore instead of restoring cleanly and
+      then throwing DllNotFoundException at runtime. (build/build-native.* still supports
+      building win-x64/osx-x64 from source for downstream consumers who bundle their own.)
     -->
-    <RuntimeIdentifiers>linux-x64;osx-arm64;osx-x64;win-x64</RuntimeIdentifiers>
+    <RuntimeIdentifiers>linux-x64;osx-arm64</RuntimeIdentifiers>
   </PropertyGroup>
 
   <!-- Expose internal helpers (native-resolver OS mapping, internal probe entry

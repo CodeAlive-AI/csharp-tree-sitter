@@ -259,22 +259,30 @@ public sealed class QueryCursor : IDisposable
 
     /// <summary>
     /// Disposes the underlying native cursor (idempotent via
-    /// <see cref="QueryCursorHandle"/>) and frees the auxiliary deadline cell.
+    /// <see cref="QueryCursorHandle"/>) and frees the auxiliary native cells.
     /// </summary>
     public void Dispose()
     {
         _handle.Dispose();
-        FreeDeadlineCell();
+        FreeNativeCells();
         GC.SuppressFinalize(this);
     }
 
-    /// <summary>Releases the unmanaged deadline cell allocated for timed execution, if any.</summary>
-    private unsafe void FreeDeadlineCell()
+    /// <summary>
+    /// Releases the unmanaged cells (deadline value and options block) allocated for
+    /// timed execution, if any.
+    /// </summary>
+    private unsafe void FreeNativeCells()
     {
         if (_deadlineCell is not null)
         {
             System.Runtime.InteropServices.NativeMemory.Free(_deadlineCell);
             _deadlineCell = null;
+        }
+        if (_optionsCell is not null)
+        {
+            System.Runtime.InteropServices.NativeMemory.Free(_optionsCell);
+            _optionsCell = null;
         }
     }
 }

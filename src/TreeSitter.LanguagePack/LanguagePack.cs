@@ -28,17 +28,21 @@ namespace TreeSitter.LanguagePack;
 /// </remarks>
 public static class LanguagePack
 {
+    // Parsed manifest (name -> info) and the extension index, built from a SINGLE
+    // deserialization of the embedded JSON so the (large) manifest is parsed only once.
+    private static readonly (FrozenDictionary<string, LanguageInfo> Manifest,
+        FrozenDictionary<string, IReadOnlyList<string>> ByExtension) Loaded = Manifests.LoadAll();
+
     // Parsed manifest: name -> info. Frozen for fast, immutable lookups.
-    private static readonly FrozenDictionary<string, LanguageInfo> Manifest = Manifests.Load();
+    private static FrozenDictionary<string, LanguageInfo> Manifest => Loaded.Manifest;
 
     // Sorted list of all manifest keys (stable, allocated once).
     private static readonly IReadOnlyList<string> SortedNames =
-        Manifest.Keys.OrderBy(static k => k, StringComparer.Ordinal).ToArray();
+        Loaded.Manifest.Keys.OrderBy(static k => k, StringComparer.Ordinal).ToArray();
 
     // extension (no dot, lowercase) -> languages that claim it. Built from each
     // entry's `extensions` plus the alternatives listed under `ambiguous`.
-    private static readonly FrozenDictionary<string, IReadOnlyList<string>> ByExtension =
-        Manifests.BuildExtensionIndex(Manifest);
+    private static FrozenDictionary<string, IReadOnlyList<string>> ByExtension => Loaded.ByExtension;
 
     // Cache of materialized Language objects, keyed by language name.
     private static readonly ConcurrentDictionary<string, Language> LanguageCache =

@@ -15,17 +15,15 @@ internal static class Manifests
     private const string ResourceName = "TreeSitter.LanguagePack.language_definitions.json";
 
     /// <summary>
-    /// Reads the embedded manifest and projects it to a frozen
-    /// <c>name -&gt; LanguageInfo</c> dictionary.
+    /// Reads and deserializes the embedded manifest <b>once</b>, returning both the
+    /// projected <c>name -&gt; LanguageInfo</c> dictionary and the extension index built
+    /// from the same parse. Sharing a single deserialization avoids reading and parsing
+    /// the (large) embedded JSON twice at startup.
     /// </summary>
-    internal static FrozenDictionary<string, LanguageInfo> Load()
+    internal static (FrozenDictionary<string, LanguageInfo> Manifest,
+        FrozenDictionary<string, IReadOnlyList<string>> ByExtension) LoadAll()
     {
-        using Stream stream = OpenManifest();
-        Dictionary<string, ManifestEntry>? raw =
-            JsonSerializer.Deserialize(stream, ManifestJsonContext.Default.DictionaryStringManifestEntry);
-
-        if (raw is null || raw.Count == 0)
-            throw new InvalidOperationException("The embedded language manifest is empty or could not be parsed.");
+        Dictionary<string, ManifestEntry> raw = DeserializeRaw();
 
         var result = new Dictionary<string, LanguageInfo>(raw.Count, StringComparer.Ordinal);
         foreach ((string name, ManifestEntry entry) in raw)
@@ -42,19 +40,27 @@ internal static class Manifests
                 AbiVersion: entry.AbiVersion ?? DefaultAbiVersion);
         }
 
-        return result.ToFrozenDictionary(StringComparer.Ordinal);
+        FrozenDictionary<string, LanguageInfo> manifest = result.ToFrozenDictionary(StringComparer.Ordinal);
+        FrozenDictionary<string, IReadOnlyList<string>> byExtension =
+            BuildExtensionIndexCore(manifest, EnumerateAmbiguous(raw));
+        return (manifest, byExtension);
     }
 
     /// <summary>The default ABI version when the manifest does not specify one.</summary>
     internal const int DefaultAbiVersion = 14;
 
-    /// <summary>
-    /// Builds the extension index: each extension (lowercase, no dot) maps to the
-    /// languages that claim it, primary owners first then ordinally by name.
-    /// </summary>
-    internal static FrozenDictionary<string, IReadOnlyList<string>> BuildExtensionIndex(
-        IReadOnlyDictionary<string, LanguageInfo> manifest) =>
-        BuildExtensionIndexCore(manifest, LoadAmbiguous());
+    /// <summary>Deserializes the embedded manifest into its raw entries, throwing if empty.</summary>
+    private static Dictionary<string, ManifestEntry> DeserializeRaw()
+    {
+        using Stream stream = OpenManifest();
+        Dictionary<string, ManifestEntry>? raw =
+            JsonSerializer.Deserialize(stream, ManifestJsonContext.Default.DictionaryStringManifestEntry);
+
+        if (raw is null || raw.Count == 0)
+            throw new InvalidOperationException("The embedded language manifest is empty or could not be parsed.");
+
+        return raw;
+    }
 
     /// <summary>
     /// Pure index builder, separated from the embedded-resource read so it can be unit
@@ -116,15 +122,10 @@ internal static class Manifests
         return combined.ToFrozenDictionary(StringComparer.Ordinal);
     }
 
-    /// <summary>Reads the <c>ambiguous</c> maps from the raw manifest as extension -&gt; alt languages.</summary>
-    private static IEnumerable<KeyValuePair<string, IReadOnlyList<string>>> LoadAmbiguous()
+    /// <summary>Projects the <c>ambiguous</c> maps from already-parsed entries as extension -&gt; alt languages.</summary>
+    private static IEnumerable<KeyValuePair<string, IReadOnlyList<string>>> EnumerateAmbiguous(
+        Dictionary<string, ManifestEntry> raw)
     {
-        using Stream stream = OpenManifest();
-        Dictionary<string, ManifestEntry>? raw =
-            JsonSerializer.Deserialize(stream, ManifestJsonContext.Default.DictionaryStringManifestEntry);
-        if (raw is null)
-            yield break;
-
         foreach (ManifestEntry entry in raw.Values)
         {
             if (entry.Ambiguous is null)

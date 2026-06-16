@@ -223,9 +223,34 @@ public class QueryCursorTests
         using Tree tree = TestData.ParseJson("[1, 2]");
         using var cursor = new QueryCursor();
         cursor.SetTimeoutMicros(60_000_000);
-        _ = cursor.Matches(query, tree.RootNode).Count();
-        // Second timed exec hits the "_deadlineCell already allocated" branch.
-        _ = cursor.Matches(query, tree.RootNode).Count();
-        Assert.True(true);
+        // Second timed exec hits the "cells already allocated" branch; both runs must
+        // still yield the full result set, proving the reused cells stay valid.
+        Assert.Equal(2, cursor.Matches(query, tree.RootNode).Count());
+        Assert.Equal(2, cursor.Matches(query, tree.RootNode).Count());
+    }
+
+    [Fact]
+    public void Timed_exec_then_manual_iteration_dereferences_retained_options()
+    {
+        // ts_query_cursor_exec_with_options STORES the options pointer and dereferences
+        // it on every later NextMatch. Driving a TIMED Exec() and then iterating several
+        // NextMatch calls over a multi-match input forces that retained pointer to be
+        // read AFTER Exec() returns. Before the fix (options on the stack) this was
+        // use-after-free / UB; after the fix the options live in a cursor-owned native
+        // cell and the iteration produces correct results.
+        using var query = new Query(Grammars.Json, "(number) @n");
+        using Tree tree = TestData.ParseJson("[10, 20, 30, 40, 50]");
+        using var cursor = new QueryCursor();
+        cursor.SetTimeoutMicros(60_000_000); // generous: routes through the options path, completes.
+        cursor.Exec(query, tree.RootNode);
+
+        var values = new List<string>();
+        while (cursor.NextMatch(out QueryMatch match))
+        {
+            Assert.Single(match.Captures);
+            Assert.Equal("number", match.Captures[0].Node.Kind);
+            values.Add(match.Captures[0].Node.Text);
+        }
+        Assert.Equal(["10", "20", "30", "40", "50"], values);
     }
 }

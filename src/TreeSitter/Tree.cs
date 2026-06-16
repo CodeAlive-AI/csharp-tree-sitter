@@ -13,6 +13,11 @@ namespace TreeSitter;
 /// <see cref="TreeHandle"/> (a <see cref="System.Runtime.InteropServices.SafeHandle"/>),
 /// so disposal is idempotent and the handle cannot be freed while a P/Invoke using
 /// it is in flight.
+/// <para><b>Node lifetime:</b> a <see cref="Node"/> obtained from this tree (directly
+/// or via navigation, queries, or cursors) is only valid while the tree is alive and
+/// undisposed. Using such a node after the tree has been disposed is undefined
+/// behavior; extract any needed data before disposing, or keep the tree alive for as
+/// long as its nodes are in use. See <see cref="Node"/>.</para>
 /// </remarks>
 public sealed class Tree : IDisposable
 {
@@ -136,5 +141,10 @@ public sealed class Tree : IDisposable
     /// Disposes the underlying native tree. Idempotent: the <see cref="TreeHandle"/>
     /// owns the critical finalizer and guards against double-free.
     /// </summary>
+    /// <remarks>
+    /// After disposal, every <see cref="Node"/> previously obtained from this tree is
+    /// invalid: its members read freed native memory, which is undefined behavior. Do
+    /// not retain or use nodes past the disposal of their owning tree.
+    /// </remarks>
     public void Dispose() => _handle.Dispose();
 }

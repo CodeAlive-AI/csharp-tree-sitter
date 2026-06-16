@@ -7,7 +7,7 @@ namespace TreeSitter.LanguagePack;
 /// </summary>
 /// <param name="Name">The canonical language key (lowercase, underscore-separated), e.g. <c>"python"</c>, <c>"csharp"</c>.</param>
 /// <param name="Repo">The HTTPS URL of the upstream tree-sitter grammar repository.</param>
-/// <param name="Rev">The pinned git commit SHA (or branch tip when no rev is recorded; empty string if neither).</param>
+/// <param name="Rev">The pinned git commit SHA, or empty string when the manifest pins only a branch.</param>
 /// <param name="Branch">The branch to clone from, if specified; otherwise <see langword="null"/>.</param>
 /// <param name="Directory">The sub-directory within the repository that holds the grammar (e.g. <c>"typescript"</c>), or <see langword="null"/>.</param>
 /// <param name="Generate">Whether the grammar must be regenerated with <c>tree-sitter generate</c> before it can be compiled (it ships <c>grammar.js</c> but no pre-generated <c>parser.c</c>).</param>

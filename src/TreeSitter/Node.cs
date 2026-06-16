@@ -11,6 +11,17 @@ namespace TreeSitter;
 /// for which the parser found no result, has <see cref="IsNull"/> set to
 /// <see langword="true"/>.
 /// </summary>
+/// <remarks>
+/// <para><b>Lifetime:</b> a <see cref="Node"/> is only valid while its owning
+/// <see cref="Tree"/> is alive and undisposed. A node holds a reference to its tree,
+/// so the tree will not be garbage-collected while a node derived from it is reachable;
+/// however, it does <b>not</b> keep the tree from being explicitly
+/// <see cref="Tree.Dispose">disposed</see>. The node's members make raw native calls
+/// against the tree's memory with no per-call liveness guard (to avoid overhead), so
+/// using a node after its tree has been disposed is <b>undefined behavior</b>. Extract
+/// any data you need (e.g. <see cref="Text"/>, <see cref="Range"/>) before disposing
+/// the tree, or keep the tree alive for as long as you hold its nodes.</para>
+/// </remarks>
 public readonly struct Node : IEquatable<Node>
 {
     private readonly TSNode _node;

@@ -113,4 +113,30 @@ public class TreeTests
         tree.Dispose();
         Assert.Throws<ObjectDisposedException>(() => tree.RootNode);
     }
+
+    [Fact]
+    public void Nodes_remain_usable_while_their_tree_is_alive()
+    {
+        // Pins the SAFE side of the Node lifetime contract: extracted nodes (and their
+        // descendants) stay fully usable for the entire lifetime of the undisposed tree.
+        // (Using a node AFTER its tree is disposed is undefined and intentionally not
+        // exercised here.)
+        using Tree tree = TestData.ParseJson("[1, \"two\", 3]");
+        Node root = tree.RootNode;
+        Node array = root.NamedChild(0);
+        Node first = array.NamedChild(0);
+        Node second = array.NamedChild(1);
+
+        // Repeated native reads via the retained node values keep returning correct
+        // results as long as the tree is alive.
+        Assert.Equal("document", root.Kind);
+        Assert.Equal("array", array.Kind);
+        Assert.Equal("number", first.Kind);
+        Assert.Equal("1", first.Text);
+        Assert.Equal("string", second.Kind);
+        Assert.Equal("\"two\"", second.Text);
+        Assert.Equal(3u, array.NamedChildCount);
+        // Navigating again from a previously-extracted node still works.
+        Assert.Equal("number", array.NamedChild(2).Kind);
+    }
 }

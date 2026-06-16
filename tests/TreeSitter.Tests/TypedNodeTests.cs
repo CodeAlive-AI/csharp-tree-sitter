@@ -102,7 +102,7 @@ public class TypedNodeTests
     public void Document_to_value_to_object_pairs()
     {
         using Tree tree = Parse("{\"name\": \"ada\", \"age\": 36}");
-        var doc = new Json.Document(tree.RootNode);
+        var doc = Json.Document.FromUnchecked(tree.RootNode);
         List<Json.Value> values = doc.Values.ToList();
         Assert.Single(values); // one top-level value (the object)
 
@@ -117,7 +117,7 @@ public class TypedNodeTests
         using Tree tree = Parse("{\"name\": \"ada\"}");
         Node objNode = tree.RootNode.NamedChild(0);
         Node pairNode = objNode.NamedChild(0);
-        var pair = new Json.Pair(pairNode);
+        var pair = Json.Pair.FromUnchecked(pairNode);
 
         Json.String key = pair.Key;
         Assert.Equal("string", key.Node.Kind);
@@ -168,7 +168,7 @@ public class TypedNodeTests
     {
         using Tree tree = Parse("[1, \"two\", true, null]");
         Node arrayNode = tree.RootNode.NamedChild(0);
-        var array = new Json.Array(arrayNode);
+        var array = Json.Array.FromUnchecked(arrayNode);
 
         List<Json.Value> elems = array.Values.ToList();
         Assert.Equal(4, elems.Count);
@@ -190,7 +190,7 @@ public class TypedNodeTests
     {
         using Tree tree = Parse("[true, false, null]");
         Node arrayNode = tree.RootNode.NamedChild(0);
-        var array = new Json.Array(arrayNode);
+        var array = Json.Array.FromUnchecked(arrayNode);
         List<Json.Value> elems = array.Values.ToList();
 
         Assert.Equal(Json.Value.Variant.True, elems[0].Which);
@@ -214,7 +214,7 @@ public class TypedNodeTests
     {
         using Tree tree = Parse("[[], {}, \"s\", 1, true, false, null]");
         Node array = tree.RootNode.NamedChild(0);
-        var arr = new Json.Array(array);
+        var arr = Json.Array.FromUnchecked(array);
         List<string> kinds = arr.Values
             .Select(v => v.Match(
                 onArray: _ => "array",
@@ -233,7 +233,7 @@ public class TypedNodeTests
     {
         using Tree tree = Parse("[\"x\\ny\"]");
         Node stringNode = tree.RootNode.NamedChild(0).NamedChild(0);
-        var str = new Json.String(stringNode);
+        var str = Json.String.FromUnchecked(stringNode);
         foreach (var c in str.Children)
         {
             string which = c.Match(
@@ -267,7 +267,7 @@ public class TypedNodeTests
         using Tree tree = Parse("[\"a\\nb\"]"); // string with an escape sequence
         Node arrayNode = tree.RootNode.NamedChild(0);
         Node stringNode = arrayNode.NamedChild(0);
-        var str = new Json.String(stringNode);
+        var str = Json.String.FromUnchecked(stringNode);
 
         List<Json.AnonUnions.EscapeSequence_StringContent> children = str.Children.ToList();
         Assert.NotEmpty(children);
@@ -312,6 +312,11 @@ public class TypedNodeTests
         // A non-extra node is rejected.
         Assert.Null(ExtraNode.TryFrom(tree.RootNode));
         Assert.Equal("comment", ExtraNode.FromUnchecked(comment.Value).Node.Kind);
+
+        // Wrap is the throwing checked factory (works in all build configs).
+        Assert.Equal("comment", ExtraNode.Wrap(comment.Value).Node.Kind);
+        IncorrectNodeKindException ex = Assert.Throws<IncorrectNodeKindException>(() => ExtraNode.Wrap(tree.RootNode));
+        Assert.Equal(nameof(ExtraNode), ex.ExpectedType);
     }
 
     [Fact]
@@ -333,6 +338,11 @@ public class TypedNodeTests
         // A present node is not missing.
         Assert.Null(MissingNode.TryFrom(tree.RootNode));
         Assert.Null(MissingNode.TryFrom(default));
+
+        // Wrap throws on a non-missing node, succeeds on the genuine one.
+        Assert.Equal(missing.Value.Kind, MissingNode.Wrap(missing.Value).Node.Kind);
+        IncorrectNodeKindException ex = Assert.Throws<IncorrectNodeKindException>(() => MissingNode.Wrap(tree.RootNode));
+        Assert.Equal(nameof(MissingNode), ex.ExpectedType);
     }
 
     [Fact]
@@ -347,6 +357,11 @@ public class TypedNodeTests
         Assert.False(ErrorNode.Accepts("ERROR"));
         Assert.Equal(err.Value.Kind, ErrorNode.FromUnchecked(err.Value).Node.Kind);
         Assert.Null(ErrorNode.TryFrom(default));
+
+        // Wrap throws on a non-error node, succeeds on the genuine one.
+        Assert.Equal(err.Value.Kind, ErrorNode.Wrap(err.Value).Node.Kind);
+        IncorrectNodeKindException wrapEx = Assert.Throws<IncorrectNodeKindException>(() => ErrorNode.Wrap(default));
+        Assert.Equal(nameof(ErrorNode), wrapEx.ExpectedType);
     }
 
     [Fact]

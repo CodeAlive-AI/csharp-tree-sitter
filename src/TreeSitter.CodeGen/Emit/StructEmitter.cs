@@ -106,10 +106,9 @@ internal sealed class StructEmitter
         _w.Line("public global::TreeSitter.Node Node { get; }");
         _w.Blank();
 
-        _w.Line($"/// <summary>Wraps <paramref name=\"node\"/> as a <see cref=\"{entry.TypeName}\"/>.</summary>");
-        _w.Line("/// <param name=\"node\">The node to wrap; its kind must be accepted.</param>");
-        _w.OpenBrace($"public {entry.TypeName}(global::TreeSitter.Node node)");
-        _w.Line($"global::System.Diagnostics.Debug.Assert(Accepts(node.Kind), \"Node kind '\" + node.Kind + \"' is not valid for {entry.TypeName}.\");");
+        _w.Line($"/// <summary>Wraps <paramref name=\"node\"/> as a <see cref=\"{entry.TypeName}\"/> without any kind check.</summary>");
+        _w.Line("/// <param name=\"node\">A node whose kind is already known to be accepted.</param>");
+        _w.OpenBrace($"private {entry.TypeName}(global::TreeSitter.Node node)");
         _w.Line("Node = node;");
         _w.CloseBrace();
         _w.Blank();
@@ -136,9 +135,12 @@ internal sealed class StructEmitter
         _w.Line($"public static {entry.TypeName}? TryFrom(global::TreeSitter.Node node) => !node.IsNull && Accepts(node.Kind) ? new {entry.TypeName}(node) : null;");
         _w.Blank();
 
-        _w.Line("/// <summary>Wraps the node without validation (a debug assert guards the kind).</summary>");
+        _w.Line("/// <summary>Wraps the node without validation; a debug assert guards the kind. Use only when the kind is already known.</summary>");
         _w.Line("/// <param name=\"node\">An already-validated node.</param>");
-        _w.Line($"public static {entry.TypeName} FromUnchecked(global::TreeSitter.Node node) => new(node);");
+        _w.OpenBrace($"public static {entry.TypeName} FromUnchecked(global::TreeSitter.Node node)");
+        _w.Line($"global::System.Diagnostics.Debug.Assert(Accepts(node.Kind), \"Node kind '\" + node.Kind + \"' is not valid for {entry.TypeName}.\");");
+        _w.Line("return new(node);");
+        _w.CloseBrace();
     }
 
     private void EmitUnionCommonMembers(AnonUnion union)
@@ -154,10 +156,9 @@ internal sealed class StructEmitter
         _w.Line("public global::TreeSitter.Node Node { get; }");
         _w.Blank();
 
-        _w.Line($"/// <summary>Wraps <paramref name=\"node\"/> as a <see cref=\"{union.TypeName}\"/>.</summary>");
-        _w.Line("/// <param name=\"node\">The node to wrap; its kind must be accepted.</param>");
-        _w.OpenBrace($"public {union.TypeName}(global::TreeSitter.Node node)");
-        _w.Line($"global::System.Diagnostics.Debug.Assert(Accepts(node.Kind), \"Node kind '\" + node.Kind + \"' is not valid for {union.TypeName}.\");");
+        _w.Line($"/// <summary>Wraps <paramref name=\"node\"/> as a <see cref=\"{union.TypeName}\"/> without any kind check.</summary>");
+        _w.Line("/// <param name=\"node\">A node whose kind is already known to be accepted.</param>");
+        _w.OpenBrace($"private {union.TypeName}(global::TreeSitter.Node node)");
         _w.Line("Node = node;");
         _w.CloseBrace();
         _w.Blank();
@@ -177,9 +178,12 @@ internal sealed class StructEmitter
         _w.Line($"public static {union.TypeName}? TryFrom(global::TreeSitter.Node node) => !node.IsNull && Accepts(node.Kind) ? new {union.TypeName}(node) : null;");
         _w.Blank();
 
-        _w.Line("/// <summary>Wraps the node without validation (a debug assert guards the kind).</summary>");
+        _w.Line("/// <summary>Wraps the node without validation; a debug assert guards the kind. Use only when the kind is already known.</summary>");
         _w.Line("/// <param name=\"node\">An already-validated node.</param>");
-        _w.Line($"public static {union.TypeName} FromUnchecked(global::TreeSitter.Node node) => new(node);");
+        _w.OpenBrace($"public static {union.TypeName} FromUnchecked(global::TreeSitter.Node node)");
+        _w.Line($"global::System.Diagnostics.Debug.Assert(Accepts(node.Kind), \"Node kind '\" + node.Kind + \"' is not valid for {union.TypeName}.\");");
+        _w.Line("return new(node);");
+        _w.CloseBrace();
     }
 
     // ---- field / children accessors -------------------------------------------
@@ -320,10 +324,10 @@ internal sealed class StructEmitter
             _w.Blank();
         }
 
-        EmitMatchAndSwitch(enumNames);
+        EmitMatchAndSwitch(entry.TypeName, enumNames);
     }
 
-    private void EmitMatchAndSwitch(List<(VariantInfo v, string accessor, string enumMember)> variants)
+    private void EmitMatchAndSwitch(string enclosingTypeName, List<(VariantInfo v, string accessor, string enumMember)> variants)
     {
         // Parameter names: on{Variant}, unique.
         var paramScope = new NameAllocator();
@@ -343,7 +347,7 @@ internal sealed class StructEmitter
             string param = paramNames[i].param;
             _w.Line($"Variant.{enumMember} => {param}({v.Member.FullName}.FromUnchecked(Node)),");
         }
-        _w.Line("_ => throw new global::TreeSitter.Typed.IncorrectNodeKindException(Node, \"Variant\"),");
+        _w.Line($"_ => throw new global::TreeSitter.Typed.IncorrectNodeKindException(Node, {Literal(enclosingTypeName)}),");
         _w.Outdent();
         _w.Line("};");
         _w.CloseBrace();
@@ -361,7 +365,7 @@ internal sealed class StructEmitter
             string param = paramNames[i].param;
             _w.Line($"case Variant.{enumMember}: {param}({v.Member.FullName}.FromUnchecked(Node)); break;");
         }
-        _w.Line("default: throw new global::TreeSitter.Typed.IncorrectNodeKindException(Node, \"Variant\");");
+        _w.Line($"default: throw new global::TreeSitter.Typed.IncorrectNodeKindException(Node, {Literal(enclosingTypeName)});");
         _w.CloseBrace();
         _w.CloseBrace();
         _w.Blank();

@@ -15,20 +15,25 @@ public readonly record struct QueryCapture(Node Node, uint Index);
 /// </summary>
 public readonly struct QueryMatch
 {
+    private readonly QueryCapture[]? _captures;
+
     /// <summary>The match's id, unique within a single query execution.</summary>
     public uint Id { get; }
 
     /// <summary>The index of the pattern that matched.</summary>
     public ushort PatternIndex { get; }
 
-    /// <summary>The captures produced by this match.</summary>
-    public QueryCapture[] Captures { get; }
+    /// <summary>
+    /// The captures produced by this match. Always non-null: a <c>default</c> or failed
+    /// match yields an empty array.
+    /// </summary>
+    public QueryCapture[] Captures => _captures ?? [];
 
     internal QueryMatch(uint id, ushort patternIndex, QueryCapture[] captures)
     {
         Id = id;
         PatternIndex = patternIndex;
-        Captures = captures;
+        _captures = captures;
     }
 }
 
