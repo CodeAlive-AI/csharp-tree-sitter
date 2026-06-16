@@ -1,0 +1,28 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <RootNamespace>TreeSitter.CodeGen</RootNamespace>
+    <AssemblyName>TreeSitter.CodeGen</AssemblyName>
+
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <LangVersion>latest</LangVersion>
+    <Deterministic>true</Deterministic>
+
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <PackageId>TreeSitter.CodeGen</PackageId>
+    <Authors>CodeAlive-AI</Authors>
+    <Description>Generates strongly-typed C# node accessors from a tree-sitter grammar's node-types.json. A pure, deterministic library with no dependency on the running parser.</Description>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/CodeAlive-AI/csharp-tree-sitter</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/CodeAlive-AI/csharp-tree-sitter</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageTags>tree-sitter;codegen;source-generator;ast</PackageTags>
+  </PropertyGroup>
+
+</Project>
