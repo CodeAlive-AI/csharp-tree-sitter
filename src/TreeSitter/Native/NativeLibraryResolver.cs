@@ -153,19 +153,37 @@ internal static class NativeLibraryResolver
         libraryName.StartsWith("tree-sitter-", StringComparison.Ordinal);
 
     /// <summary>
-    /// Maps a logical library name to the platform-specific file name, e.g.
-    /// <c>"tree-sitter"</c> -&gt; <c>libtree-sitter.so</c> on Linux,
+    /// Maps a logical library name to the platform-specific file name for the
+    /// current OS, e.g. <c>"tree-sitter"</c> -&gt; <c>libtree-sitter.so</c> on Linux,
     /// <c>tree-sitter.dll</c> on Windows, <c>libtree-sitter.dylib</c> on macOS.
     /// </summary>
-    private static string MapToFileName(string logicalName)
+    private static string MapToFileName(string logicalName) =>
+        MapLibraryFileName(logicalName, CurrentOSPlatform());
+
+    /// <summary>
+    /// Pure mapping from a logical library name and target <see cref="OSPlatform"/>
+    /// to the platform shared-library file name. Exposed for testing every OS branch
+    /// from any host: Windows -&gt; <c>&lt;name&gt;.dll</c>, macOS -&gt;
+    /// <c>lib&lt;name&gt;.dylib</c>, everything else (Linux/Unix) -&gt;
+    /// <c>lib&lt;name&gt;.so</c>.
+    /// </summary>
+    /// <param name="logicalName">The logical (extension-less) library name.</param>
+    /// <param name="os">The target operating-system platform.</param>
+    internal static string MapLibraryFileName(string logicalName, OSPlatform os)
     {
-        if (OperatingSystem.IsWindows())
+        if (os == OSPlatform.Windows)
             return logicalName + ".dll";
-        if (OperatingSystem.IsMacOS())
+        if (os == OSPlatform.OSX)
             return "lib" + logicalName + ".dylib";
         // Linux and other Unix-likes.
         return "lib" + logicalName + ".so";
     }
+
+    /// <summary>The <see cref="OSPlatform"/> the process is currently running on.</summary>
+    private static OSPlatform CurrentOSPlatform() =>
+        OperatingSystem.IsWindows() ? OSPlatform.Windows :
+        OperatingSystem.IsMacOS() ? OSPlatform.OSX :
+        OSPlatform.Linux;
 
     private static bool TryLoadFrom(string path, out IntPtr handle)
     {
@@ -210,26 +228,33 @@ internal static class NativeLibraryResolver
     /// The .NET runtime identifier for the current OS + architecture, used to build
     /// <c>runtimes/&lt;rid&gt;/native</c> and <c>native/&lt;rid&gt;</c> paths.
     /// </summary>
-    private static string RuntimeIdentifier
+    private static string RuntimeIdentifier =>
+        GetRid(CurrentOSPlatform(), RuntimeInformation.ProcessArchitecture);
+
+    /// <summary>
+    /// Pure mapping from an <see cref="OSPlatform"/> and <see cref="Architecture"/>
+    /// to a portable .NET runtime identifier (e.g. <c>linux-x64</c>, <c>osx-arm64</c>,
+    /// <c>win-x64</c>). Exposed for testing every OS/arch branch from any host.
+    /// </summary>
+    /// <param name="os">The target operating-system platform.</param>
+    /// <param name="arch">The target process architecture.</param>
+    internal static string GetRid(OSPlatform os, Architecture arch)
     {
-        get
+        string osPart =
+            os == OSPlatform.Windows ? "win" :
+            os == OSPlatform.OSX ? "osx" :
+            "linux";
+
+        string archPart = arch switch
         {
-            string os =
-                OperatingSystem.IsWindows() ? "win" :
-                OperatingSystem.IsMacOS() ? "osx" :
-                "linux";
+            Architecture.X64 => "x64",
+            Architecture.X86 => "x86",
+            Architecture.Arm64 => "arm64",
+            Architecture.Arm => "arm",
+            _ => arch.ToString().ToLowerInvariant(),
+        };
 
-            string arch = RuntimeInformation.ProcessArchitecture switch
-            {
-                Architecture.X64 => "x64",
-                Architecture.X86 => "x86",
-                Architecture.Arm64 => "arm64",
-                Architecture.Arm => "arm",
-                _ => RuntimeInformation.ProcessArchitecture.ToString().ToLowerInvariant(),
-            };
-
-            return $"{os}-{arch}";
-        }
+        return $"{osPart}-{archPart}";
     }
 }
 
