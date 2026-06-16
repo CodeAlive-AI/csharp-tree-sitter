@@ -277,3 +277,67 @@ public class LanguagePackTests
         Assert.Throws<ArgumentNullException>(() => Pack.FindAllByExtension(null!));
     }
 }
+
+/// <summary>
+/// White-box tests of the internal manifest helpers (the index builder's edge cases and
+/// the extension normalizer), reached via InternalsVisibleTo.
+/// </summary>
+public class LanguagePackInternalsTests
+{
+    [Theory]
+    [InlineData(".py", "py")]
+    [InlineData("py", "py")]
+    [InlineData("  .CS ", "cs")]
+    [InlineData("", "")]
+    [InlineData(".", "")]
+    public void NormalizeExtension_strips_dot_trims_and_lowercases(string input, string expected)
+    {
+        Assert.Equal(expected, Pack.NormalizeExtension(input));
+    }
+
+    private static LanguageInfo Info(string name, params string[] exts) =>
+        new(name, "repo", "rev", null, null, false, name, exts, 14);
+
+    [Fact]
+    public void BuildExtensionIndexCore_orders_primary_then_secondary()
+    {
+        var manifest = new Dictionary<string, LanguageInfo>(StringComparer.Ordinal)
+        {
+            ["c"] = Info("c", "h"),
+            ["cpp"] = Info("cpp", "cc"),
+            ["objc"] = Info("objc", "m"),
+        };
+        // c primarily owns "h"; cpp and objc are ambiguous alternatives for "h".
+        var ambiguous = new[]
+        {
+            new KeyValuePair<string, IReadOnlyList<string>>("h", new[] { "cpp", "objc" }),
+        };
+
+        var index = Manifests.BuildExtensionIndexCore(manifest, ambiguous);
+        Assert.Equal(new[] { "c", "cpp", "objc" }, index["h"]);
+    }
+
+    [Fact]
+    public void BuildExtensionIndexCore_skips_unknown_and_already_primary_alternatives()
+    {
+        var manifest = new Dictionary<string, LanguageInfo>(StringComparer.Ordinal)
+        {
+            // "x" claims ext "e" with an EMPTY extension entry mixed in (covers the
+            // empty-extension skip), and "y" also claims "e" (so it is already primary).
+            ["x"] = Info("x", "e", ""),
+            ["y"] = Info("y", "e"),
+        };
+        var ambiguous = new[]
+        {
+            // "y" is already a primary owner of "e" -> skipped (not duplicated).
+            // "ghost" is not in the manifest -> skipped.
+            new KeyValuePair<string, IReadOnlyList<string>>("e", new[] { "y", "ghost" }),
+        };
+
+        var index = Manifests.BuildExtensionIndexCore(manifest, ambiguous);
+        Assert.Equal(new[] { "x", "y" }, index["e"]);
+        Assert.DoesNotContain("ghost", index["e"]);
+        // The empty extension contributed no key.
+        Assert.False(index.ContainsKey(string.Empty));
+    }
+}
