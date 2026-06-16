@@ -16,7 +16,7 @@ git clone https://github.com/tree-sitter/csharp-tree-sitter.git --recursive
 
 Requirements:
 - Windows-only (the Makefile in the `tree-sitter` has OS-specific stuff in it so far)
-- .NET 7
+- .NET 10
 
 We'll first need to build the dependencies, and then the C# project.
 
