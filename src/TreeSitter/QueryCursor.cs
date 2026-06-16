@@ -245,6 +245,12 @@ public sealed class QueryCursor : IDisposable
         QueryCapture[] captures;
         if (raw.CaptureCount == 0 || raw.Captures == IntPtr.Zero)
         {
+            // A positive capture count with a null captures pointer should be impossible:
+            // tree-sitter always sets `captures` when `capture_count > 0`. Flag it in debug
+            // builds, then fall back to the empty array defensively in release.
+            System.Diagnostics.Debug.Assert(
+                raw.CaptureCount == 0,
+                "TSQueryMatch reported CaptureCount > 0 but a null Captures pointer.");
             captures = [];
         }
         else
