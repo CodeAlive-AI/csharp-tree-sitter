@@ -48,10 +48,22 @@ public sealed class QueryCursor : IDisposable
     /// </summary>
     /// <param name="query">The query to run.</param>
     /// <param name="node">The node to run it against.</param>
+    /// <remarks>
+    /// The <paramref name="query"/> and the owning <see cref="Tree"/> of
+    /// <paramref name="node"/> must outlive iteration: the native cursor retains
+    /// references to the query and the tree's nodes, and (for timed execution) to a
+    /// progress-callback options block, all of which are dereferenced by subsequent
+    /// <see cref="NextMatch"/>/<see cref="NextCapture"/> calls. This cursor roots the
+    /// query and tree internally for the duration of the run; callers must still keep
+    /// the <see cref="Tree"/> undisposed.
+    /// </remarks>
     public unsafe void Exec(Query query, Node node)
     {
         ArgumentNullException.ThrowIfNull(query);
         _tree = node.OwningTree;
+        // Root the query so neither it nor its QueryHandle can be GC-finalized while
+        // the native cursor still references the query's state during iteration.
+        _query = query;
 
         if (_timeoutMicros == 0)
         {
@@ -59,24 +71,29 @@ public sealed class QueryCursor : IDisposable
             return;
         }
 
-        // Enforce the configured timeout via the progress callback, which fires
-        // during subsequent NextMatch/NextCapture calls. The deadline therefore must
-        // outlive Exec(); it is stored in a native cell owned by this cursor (freed
-        // on the next timed exec and on Dispose) so the payload pointer stays valid.
+        // Enforce the configured timeout via the progress callback, which fires during
+        // subsequent NextMatch/NextCapture calls. Unlike ts_parser_parse_with_options
+        // (which copies the options by value), ts_query_cursor_exec_with_options STORES
+        // the options pointer and dereferences it on every later NextMatch/NextCapture.
+        // The options block AND the deadline it points at must therefore outlive Exec();
+        // both live in native cells owned by this cursor (freed on Dispose) so the
+        // retained pointer stays valid for the whole exec->iterate window.
         if (_deadlineCell is null)
             _deadlineCell = (long*)System.Runtime.InteropServices.NativeMemory.Alloc((nuint)sizeof(long));
+        if (_optionsCell is null)
+            _optionsCell = (TSQueryCursorOptions*)System.Runtime.InteropServices.NativeMemory.Alloc(
+                (nuint)sizeof(TSQueryCursorOptions));
+
         *_deadlineCell = System.Diagnostics.Stopwatch.GetTimestamp() +
             (long)((double)_timeoutMicros / 1_000_000.0 * System.Diagnostics.Stopwatch.Frequency);
+        _optionsCell->Payload = (IntPtr)_deadlineCell;
+        _optionsCell->ProgressCallback = &QueryProgressThunk;
 
-        var options = new TSQueryCursorOptions
-        {
-            Payload = (IntPtr)_deadlineCell,
-            ProgressCallback = &QueryProgressThunk,
-        };
-        NativeMethods.ts_query_cursor_exec_with_options(Handle, query.Handle, node.Raw, &options);
+        NativeMethods.ts_query_cursor_exec_with_options(Handle, query.Handle, node.Raw, _optionsCell);
     }
 
     private unsafe long* _deadlineCell;
+    private unsafe TSQueryCursorOptions* _optionsCell;
 
     [System.Runtime.InteropServices.UnmanagedCallersOnly(
         CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
@@ -91,6 +108,12 @@ public sealed class QueryCursor : IDisposable
     /// </summary>
     /// <param name="match">The next match, if any.</param>
     /// <returns><see langword="true"/> if a match was produced.</returns>
+    /// <remarks>
+    /// Must be called only after <see cref="Exec"/>. The <see cref="Query"/> passed to
+    /// <see cref="Exec"/> and the owning <see cref="Tree"/> of the executed node must
+    /// remain alive and undisposed until iteration completes; the native cursor
+    /// dereferences their state on every call.
+    /// </remarks>
     public unsafe bool NextMatch(out QueryMatch match)
     {
         TSQueryMatch raw;
@@ -131,6 +154,12 @@ public sealed class QueryCursor : IDisposable
     /// </summary>
     /// <param name="query">The query to run.</param>
     /// <param name="node">The node to run it against.</param>
+    /// <remarks>
+    /// The <paramref name="query"/> and the owning <see cref="Tree"/> of
+    /// <paramref name="node"/> must remain alive and undisposed while the returned
+    /// sequence is being enumerated; the native cursor dereferences their state on
+    /// each step.
+    /// </remarks>
     public IEnumerable<QueryMatch> Matches(Query query, Node node)
     {
         Exec(query, node);
